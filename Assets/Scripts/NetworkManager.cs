@@ -103,6 +103,8 @@ namespace FootBall
         private NetworkInputData inputData = new();
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
+            inputData.direction = Vector3.zero;
+
             if (Input.GetKey(KeyCode.W))
                 inputData.direction += Vector3.forward;
 
@@ -147,8 +149,20 @@ namespace FootBall
                 NetworkObject networkPlayerObject = runner.Spawn(PlayerPrefab, spawnPos, Quaternion.identity, player);
                 // save for further handling
                 PlayerObjects.Add(player, networkPlayerObject);
+
+                // RPC_OnPlayerSpawned(player, networkPlayerObject);
             }
         }
+
+        // [Rpc(RpcSources.StateAuthority, RpcTargets.All, RpcHostMode.SourceIsServer)]
+        // public void RPC_OnPlayerSpawned(PlayerRef player, NetworkObject playerObject)
+        // {
+        //     // activate camera on player object if its our player
+        //     if (playerObject.HasInputAuthority) // player == runner.localPlayer()
+        //     {
+        //         playerObject.gameObject.GetComponentInChildren<Camera>().gameObject.SetActive(true);
+        //     }
+        // }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
