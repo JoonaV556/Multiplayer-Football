@@ -9,7 +9,13 @@ namespace FootBall
 {
     public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
+        public GameObject PlayerPrefab;
+
         private NetworkRunner runner; // heart of photon
+
+        private Dictionary<PlayerRef, NetworkObject> PlayerObjects = new();
+
+        Vector3 lastSpawnPoint = Vector3.zero;
 
         private async void StartGame(GameMode mode)
         {
@@ -33,6 +39,12 @@ namespace FootBall
                 Scene = scene,
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
             };
+
+            if (args.GameMode == GameMode.Host)
+            {
+                args.PlayerCount = 4; // limit to 4 players
+            }
+
             await runner.StartGame(
                 args
             );
@@ -88,9 +100,22 @@ namespace FootBall
             // Handle host migration logic
         }
 
+        private NetworkInputData inputData = new();
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
-            // Handle input logic
+            if (Input.GetKey(KeyCode.W))
+                inputData.direction += Vector3.forward;
+
+            if (Input.GetKey(KeyCode.S))
+                inputData.direction += Vector3.back;
+
+            if (Input.GetKey(KeyCode.A))
+                inputData.direction += Vector3.left;
+
+            if (Input.GetKey(KeyCode.D))
+                inputData.direction += Vector3.right;
+
+            input.Set(inputData);
         }
 
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
@@ -113,12 +138,32 @@ namespace FootBall
             if (runner.IsServer)
             {
                 TypeLogger.TypeLog(this, @$"Player with id {player.PlayerId} joined game", 1);
+
+                // create object for player
+                // get spawn position
+                Vector3 spawnPos = lastSpawnPoint + new Vector3(2f, 0, 0);
+                lastSpawnPoint = spawnPos;
+                // spawn
+                NetworkObject networkPlayerObject = runner.Spawn(PlayerPrefab, spawnPos, Quaternion.identity, player);
+                // save for further handling
+                PlayerObjects.Add(player, networkPlayerObject);
             }
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            // Handle logic when player leaves
+            if (runner.IsServer)
+            {
+                TypeLogger.TypeLog(this, @$"Player with id {player.PlayerId} left game", 1);
+
+                // remove player object
+                if (PlayerObjects.TryGetValue(player, out NetworkObject networkObject))
+                {
+                    runner.Despawn(networkObject);
+                    PlayerObjects.Remove(player);
+                    TypeLogger.TypeLog(this, @$"Removed left players object", 1);
+                }
+            }
         }
 
         public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
