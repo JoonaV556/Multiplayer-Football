@@ -117,7 +117,17 @@ namespace FootBall
             if (Input.GetKey(KeyCode.D))
                 inputData.direction += Vector3.right;
 
+            // Update button press state to server
+            inputData.buttons.Set(NetworkInputData.MOUSEBUTTON0, _mouseButton0);
+            _mouseButton0 = false;
+
             input.Set(inputData);
+        }
+
+        private bool _mouseButton0;
+        private void Update()
+        {
+            _mouseButton0 = _mouseButton0 | Input.GetMouseButton(0);
         }
 
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)

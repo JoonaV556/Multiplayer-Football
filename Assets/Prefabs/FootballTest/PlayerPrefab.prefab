@@ -111,6 +111,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25f054966b5e506479ada42fe798f638, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BallPrefab: {fileID: 2418048049032726822, guid: 0cd501ac56858dd4c8273902399c9a6c, type: 3}
+  BallFireCooldown: 5
 --- !u!1 &5938374662359292433
 GameObject:
   m_ObjectHideFlags: 0
