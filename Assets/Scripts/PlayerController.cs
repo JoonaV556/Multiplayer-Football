@@ -1,12 +1,11 @@
 using Fusion;
+using UnityEngine;
 
 namespace FootBall
 {
     public class PlayerController : NetworkBehaviour
     {
         private NetworkCharacterController _characterController;
-
-        public float MoveSpeed = 30f;
 
         private void Awake()
         {
@@ -19,7 +18,7 @@ namespace FootBall
             if (GetInput(out NetworkInputData data))
             {
                 data.direction.Normalize();
-                _characterController.Move(MoveSpeed * data.direction * Runner.DeltaTime);
+                _characterController.Move(data.direction * Runner.DeltaTime);
             }
         }
     }
