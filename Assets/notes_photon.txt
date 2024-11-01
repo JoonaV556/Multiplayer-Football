@@ -10,6 +10,24 @@ It is therefore possible to encapsulate code paths which should only be executed
 by using an if-statement with Object.HasStateAuthority. 
 Object.HasStateAuthority will only ever return true on the server / host.
 
+spawn networked objects
+------------------------------------------------
+if (runner.IsServer)
+    {
+        TypeLogger.TypeLog(this, @$"Player with id {player.PlayerId} joined game", 1);
+
+        // create object for player
+        // get spawn position
+        Vector3 spawnPos = lastSpawnPoint + new Vector3(2f, 0, 0);
+        lastSpawnPoint = spawnPos;
+        // spawn
+        NetworkObject networkPlayerObject = runner.Spawn(PlayerPrefab, spawnPos, Quaternion.identity, player);
+        // save for further handling
+        PlayerObjects.Add(player, networkPlayerObject);
+
+        // RPC_OnPlayerSpawned(player, networkPlayerObject);
+    }
+
 
 network synced update 
 ------------------------------------------------
