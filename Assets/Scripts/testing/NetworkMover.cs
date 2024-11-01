@@ -1,6 +1,6 @@
 using Fusion;
 
-namespace FootBall
+namespace FusionTutorial
 {
     public class NetworkMover : NetworkBehaviour
     {

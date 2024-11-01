@@ -1,7 +1,7 @@
 using Fusion;
 using UnityEngine;
 
-namespace FootBall
+namespace FusionTutorial
 {
     public struct NetworkInputData : INetworkInput
     {

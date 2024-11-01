@@ -1,0 +1,30 @@
+check if code is run by server
+------------------------------------------------
+if (runner.IsServer)
+
+
+execute code on host only - (host mode)
+------------------------------------------------
+In ServerMode and HostMode, the simulation on the server / host is single state authority. 
+It is therefore possible to encapsulate code paths which should only be executed there 
+by using an if-statement with Object.HasStateAuthority. 
+Object.HasStateAuthority will only ever return true on the server / host.
+
+
+network synced update 
+------------------------------------------------
+FixedUpdateNetwork()
+
+
+server-authoritative input handling (not always necessary)
+------------------------------------------------
+Define input with
+INetworkInput
+
+Send input w/
+OnInput()
+
+Read input in 
+FixedUpdateNetwork(){
+    GetInput(out NetworkInputData data)
+}

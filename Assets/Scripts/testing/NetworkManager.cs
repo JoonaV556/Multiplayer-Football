@@ -5,7 +5,7 @@ using Fusion.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace FootBall
+namespace FusionTutorial
 {
     public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
