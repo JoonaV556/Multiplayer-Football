@@ -18,6 +18,9 @@ namespace FootBall
             {
                 // spawn football
                 Runner.Spawn(BallPrefab, BallSpawnPosition);
+
+                // Spawn another for testing
+                Runner.Spawn(BallPrefab, BallSpawnPosition + new Vector3(0f, 1f, 0f));
             }
         }
     }
