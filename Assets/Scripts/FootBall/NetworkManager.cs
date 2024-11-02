@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Fusion;
 using Fusion.Sockets;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
