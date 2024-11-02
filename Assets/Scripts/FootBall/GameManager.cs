@@ -4,7 +4,7 @@ using UnityEngine;
 namespace FootBall
 {
     /// <summary>
-    /// Manages football game-related logic. Exists only on host.
+    /// Manages football game-related logic.
     /// </summary>
     public class GameManager : NetworkBehaviour
     {

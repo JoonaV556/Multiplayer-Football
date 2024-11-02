@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Fusion;
 using Fusion.Sockets;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,9 +15,15 @@ namespace FootBall
     {
         public string SessionName = "FootballTestSession";
 
+        public NetworkObject PlayerPrefab;
+
         public NetworkObject GameManager;
 
+        public GameObject FieldCamera;
+
         private NetworkRunner runner;
+
+        private Dictionary<PlayerRef, NetworkObject> PlayerObjects;
 
         /// <summary>
         /// Starts new network session by hosting or joining existing one
@@ -92,6 +99,7 @@ namespace FootBall
 
         public void OnConnectedToServer(NetworkRunner runner)
         {
+            TypeLogger.TypeLog(this, "Connected to server", 1);
         }
 
         public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
@@ -132,10 +140,40 @@ namespace FootBall
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
+            TypeLogger.TypeLog(this, "Player joined", 1);
+
+            // Spawn Players
+            if (runner.IsServer)
+            {
+                var playerObject = runner.Spawn(
+                    PlayerPrefab,
+                    Vector3.zero,
+                    Quaternion.identity,
+                    player
+                    );
+
+                if (PlayerObjects == null)
+                    PlayerObjects = new();
+
+                PlayerObjects.Add(player, playerObject);
+            }
+
+            // Disable overview camera when player spawns - player will see game through first person
+            if (runner.LocalPlayer == player)
+            {
+                FieldCamera.SetActive(false);
+            }
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
+            // remove player objects
+            if (runner.IsServer)
+            {
+                var playerObject = PlayerObjects[player];
+                PlayerObjects.Remove(player);
+                runner.Despawn(playerObject);
+            }
         }
 
         public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)

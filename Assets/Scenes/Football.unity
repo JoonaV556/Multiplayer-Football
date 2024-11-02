@@ -1707,7 +1707,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SessionName: FootballTestSession
+  PlayerPrefab: {fileID: 3894992498498455800, guid: d2c8a4b365f6f4845b0f8c180df0b545, type: 3}
   GameManager: {fileID: 328925299644645989, guid: 224389f2620a0a14f84cc996a980b798, type: 3}
+  FieldCamera: {fileID: 1151640084}
 --- !u!1 &711924503
 GameObject:
   m_ObjectHideFlags: 0
@@ -2559,10 +2561,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1151640088}
   - component: {fileID: 1151640087}
-  - component: {fileID: 1151640086}
   - component: {fileID: 1151640085}
   m_Layer: 0
-  m_Name: Camera
+  m_Name: FieldCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2612,14 +2613,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &1151640086
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1151640084}
-  m_Enabled: 1
 --- !u!20 &1151640087
 Camera:
   m_ObjectHideFlags: 0
