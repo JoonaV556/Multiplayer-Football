@@ -1658,8 +1658,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 772631796}
   - {fileID: 669750108}
+  - {fileID: 772631796}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &669750107
@@ -1674,7 +1674,7 @@ GameObject:
   - component: {fileID: 669750109}
   - component: {fileID: 669750110}
   m_Layer: 0
-  m_Name: NetworkManager
+  m_Name: Managers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
