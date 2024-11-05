@@ -57,9 +57,7 @@ namespace FootBall
                 args.PlayerCount = 4; // limit to 4 players
             }
 
-            await runner.StartGame(
-                args
-            );
+            await runner.StartGame(args);
 
             OnSessionStarted();
 

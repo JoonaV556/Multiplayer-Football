@@ -1,0 +1,24 @@
+input management - reading input in game logic
+---------------------------------------------------
+
+Input manager responsibilities
+    (handles input on each client without server authorization)
+    - reads input from buttons during networktick
+
+    - stores data in INetworkInput struct
+
+    - lets input users read input during each networktick
+
+    - resets data back to zero after each networktick
+
+
+    - provides objects way to read data
+        - IInputConsumer
+            - ConsumeInput
+
+
+InputEnvoy
+    - monobehavior script attached to gameObject
+    - on enable 
+        - gathers and sends a list of input users to Input manager
+    - on disable     
