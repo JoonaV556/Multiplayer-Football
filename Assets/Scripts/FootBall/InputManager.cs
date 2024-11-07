@@ -8,6 +8,11 @@ namespace FootBall
     {
         public InputActionAsset inputActions;
 
+        [Range(0f, 10f)]
+        public float LookVerticalSensitivityMultiplier = 1f;
+        [Range(0f, 10f)]
+        public float LookHorizontalSensitivityMultiplier = 1f;
+
         InputAction moveAction;
         InputAction lookAction;
 
@@ -27,13 +32,20 @@ namespace FootBall
             inputActions.Disable();
         }
 
-        public override void FixedUpdateNetwork()
+        private void Update()
         {
-            // update data each tick
+            // Update input
             Data.MoveInput = moveAction.ReadValue<Vector2>();
-            Data.LookInput = lookAction.ReadValue<Vector2>();
-            TypeLogger.TypeLog(this, $"move vector {Data.MoveInput}", 1);
-            TypeLogger.TypeLog(this, $"look delta {Data.LookInput}", 1);
+            var rawLookInput = lookAction.ReadValue<Vector2>();
+            // apply sensitivity multipliers to look input
+            Data.LookInput = new Vector2(
+                rawLookInput.x * LookHorizontalSensitivityMultiplier,
+                rawLookInput.y * LookVerticalSensitivityMultiplier
+            );
+
+
+            // TypeLogger.TypeLog(this, $"move vector {Data.MoveInput}", 1);
+            // TypeLogger.TypeLog(this, $"look delta {Data.LookInput}", 1);
         }
     }
 }

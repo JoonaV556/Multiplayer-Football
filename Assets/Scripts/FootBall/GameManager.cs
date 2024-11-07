@@ -14,6 +14,9 @@ namespace FootBall
 
         public void InitializeMatch()
         {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
             if (HasStateAuthority)
             {
                 // spawn football
