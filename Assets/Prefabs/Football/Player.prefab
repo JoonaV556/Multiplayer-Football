@@ -453,6 +453,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FpCamera: {fileID: 4992658428033895871}
   BodyVisual: {fileID: 3610551083804639446}
+  CameraRotMaxY: 89
+  CameraRotMinY: -89
+  MoveForce: 10
 --- !u!54 &6611896133240249461
 Rigidbody:
   m_ObjectHideFlags: 0

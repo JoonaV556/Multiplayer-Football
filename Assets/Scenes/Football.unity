@@ -4382,8 +4382,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputActions: {fileID: -944628639613478452, guid: 209a8615de236b74e808b0f335de1efa, type: 3}
-  LookVerticalSensitivityMultiplier: 5
-  LookHorizontalSensitivityMultiplier: 5
+  LookVerticalSensitivityMultiplier: 8
+  LookHorizontalSensitivityMultiplier: 8
 --- !u!1 &1957539483
 GameObject:
   m_ObjectHideFlags: 0

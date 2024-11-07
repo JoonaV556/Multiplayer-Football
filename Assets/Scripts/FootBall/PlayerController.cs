@@ -8,6 +8,13 @@ namespace FootBall
         public GameObject FpCamera;
         public GameObject BodyVisual;
 
+        [Range(0.1f, 89f)]
+        public float CameraRotMaxY = 89f;
+        [Range(-0.1f, -89f)]
+        public float CameraRotMinY = -89f;
+
+        public float MoveForce = 2f;
+
         private Rigidbody rigidbody;
 
         public override void Spawned()
@@ -17,9 +24,8 @@ namespace FootBall
             {
                 FpCamera.SetActive(true); // Activate first person camera
                 BodyVisual.SetActive(false);
+                rigidbody = GetComponent<Rigidbody>();
             }
-
-            rigidbody = GetComponent<Rigidbody>();
         }
 
         public override void FixedUpdateNetwork()
@@ -34,57 +40,27 @@ namespace FootBall
                 0f
                 );
             rigidbody.MoveRotation(Quaternion.Euler(newRot));
+
+            // move player 
+            rigidbody.AddForce(
+                transform.TransformDirection(
+                    InputManager.Data.MoveInput.x,
+                    0f,
+                    InputManager.Data.MoveInput.y
+                ).normalized * MoveForce,
+                ForceMode.Force);
         }
-        public Vector3 rot;
+
+        private float rot = 0f;
         private void Update()
         {
             if (!HasInputAuthority) return;
-            // Limit camera vertical angle
-            rot = FpCamera.transform.localEulerAngles;
-            var change = (-InputManager.Data.LookInput.y * Time.deltaTime);
 
-            if (
-                rot.x > 0.01f
-                &&
-                rot.x < 89.99f
-                &&
-                (rot.x + change) > 89.99f
-                )
-            {
-                rot = new Vector3(
-                    Mathf.Clamp(rot.x + change, 0.01f, 89.99f),
-                    0f,
-                    0f
-                );
-                FpCamera.transform.localEulerAngles = rot;
-                TypeLogger.TypeLog(this, "limiting down", 1);
-                return;
-            }
-
-            if (
-                rot.x < 359.99f
-                &&
-                rot.x > 270.01f
-                &&
-                (rot.x + change) < 270.01f
-                )
-            {
-                rot = new Vector3(
-                    Mathf.Clamp(rot.x + change, 270.01f, 359.99f),
-                    0f,
-                    0f
-                );
-                FpCamera.transform.localEulerAngles = rot;
-                TypeLogger.TypeLog(this, "limiting up", 1);
-                return;
-            }
+            var change = -InputManager.Data.LookInput.y * Time.deltaTime;
+            rot = Mathf.Clamp(rot + change, CameraRotMinY, CameraRotMaxY);
 
             // turn player camera up and down
-            FpCamera.transform.Rotate(
-                -InputManager.Data.LookInput.y * Time.deltaTime,
-                0f,
-                0f
-                );
+            FpCamera.transform.localRotation = Quaternion.Euler(rot, 0f, 0f);
         }
     }
 }
