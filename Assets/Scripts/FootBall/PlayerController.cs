@@ -1,5 +1,6 @@
 using UnityEngine;
 using Fusion;
+using static TypeLogger;
 
 namespace FootBall
 {
@@ -15,16 +16,22 @@ namespace FootBall
 
         public float MoveForce = 2f;
 
-        private Rigidbody rigidbody;
+        Rigidbody _rb;
 
         public override void Spawned()
         {
+            TypeLog(this, "we spawned", 1);
             // prepare player clientside
             if (HasInputAuthority)
             {
-                FpCamera.SetActive(true); // Activate first person camera
-                BodyVisual.SetActive(false);
-                rigidbody = GetComponent<Rigidbody>();
+                TypeLog(this, "we have input authority", 1);
+                this.FpCamera.SetActive(true); // Activate first person camera
+                this._rb = GetComponent<Rigidbody>();
+            }
+            else
+            {
+                this.BodyVisual.SetActive(true);
+                TypeLog(this, "we activated body visual", 1);
             }
         }
 
@@ -39,10 +46,10 @@ namespace FootBall
                 (InputManager.Data.LookInput.x * Runner.DeltaTime),
                 0f
                 );
-            rigidbody.MoveRotation(Quaternion.Euler(newRot));
+            _rb.MoveRotation(Quaternion.Euler(newRot));
 
             // move player 
-            rigidbody.AddForce(
+            _rb.AddForce(
                 transform.TransformDirection(
                     InputManager.Data.MoveInput.x,
                     0f,
