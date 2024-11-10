@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1265958319378735746}
   - component: {fileID: 4611363414445140174}
   - component: {fileID: 8467771347046284333}
+  - component: {fileID: 2249059675805669476}
   m_Layer: 0
   m_Name: visual
   m_TagString: Untagged
@@ -87,6 +88,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &2249059675805669476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3610551083804639446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
 --- !u!1 &4796322218466140002
 GameObject:
   m_ObjectHideFlags: 0
@@ -354,7 +371,6 @@ GameObject:
   - component: {fileID: 2696680621105165467}
   - component: {fileID: 3894992498498455800}
   - component: {fileID: 3650034825204625014}
-  - component: {fileID: 7939201983383612182}
   - component: {fileID: 7871031117671634198}
   - component: {fileID: 6611896133240249461}
   - component: {fileID: 5238263696009450678}
@@ -400,6 +416,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 3650034825204625014}
   - {fileID: 7871031117671634198}
+  - {fileID: 2249059675805669476}
 --- !u!114 &3650034825204625014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -422,23 +439,6 @@ MonoBehaviour:
     Position: 0.01
     Rotation: 0.01
     Scale: 0.01
---- !u!114 &7939201983383612182
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9110405930881780401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b5a1ff9dee264bfd829a39e6542dcbd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _physicsAuthority: 2
-  _physicsTiming: 3
-  ClientPhysicsSimulation: 0
-  DeltaTimeMultiplier: 1
-  SetUnityFixedTimestep: 0
 --- !u!114 &7871031117671634198
 MonoBehaviour:
   m_ObjectHideFlags: 0

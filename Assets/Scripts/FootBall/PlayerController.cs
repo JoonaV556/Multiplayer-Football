@@ -18,56 +18,56 @@ namespace FootBall
 
         Rigidbody _rb;
 
+        private float lookYRot = 0f;
+
         public override void Spawned()
         {
             TypeLog(this, "we spawned", 1);
-            // prepare player clientside
+            this._rb = gameObject.GetComponent<Rigidbody>();
+
+            // prepare player object clientside
             if (HasInputAuthority)
             {
                 TypeLog(this, "we have input authority", 1);
-                this.FpCamera.SetActive(true); // Activate first person camera
-                this._rb = GetComponent<Rigidbody>();
+                this.FpCamera.SetActive(true); // If this player is us, make us see through the characters first person camera
             }
             else
             {
                 this.BodyVisual.SetActive(true);
-                TypeLog(this, "we activated body visual", 1);
+                TypeLog(this, "we activated body visual", 1); // If this is not our player, make it visible to us
             }
         }
 
         public override void FixedUpdateNetwork()
         {
-            if (!HasInputAuthority) return;
+            if (_rb == null) return;
 
-            // turn player body left and right with look input
-            var rot = transform.rotation.eulerAngles;
-            var newRot = rot + new Vector3(
-                0f,
-                (InputManager.Data.LookInput.x * Runner.DeltaTime),
-                0f
-                );
-            _rb.MoveRotation(Quaternion.Euler(newRot));
-
-            // move player 
-            _rb.AddForce(
-                transform.TransformDirection(
-                    InputManager.Data.MoveInput.x,
+            // get input from the player who has input authority over this controller
+            if (GetInput(out InputData data))
+            {
+                // turn player body left and right with look input
+                var bodyRot = transform.rotation.eulerAngles;
+                var newRot = bodyRot + new Vector3(
                     0f,
-                    InputManager.Data.MoveInput.y
-                ).normalized * MoveForce,
-                ForceMode.Force);
-        }
+                    data.LookInput.x * Runner.DeltaTime,
+                    0f
+                    );
+                _rb.MoveRotation(Quaternion.Euler(newRot));
 
-        private float rot = 0f;
-        private void Update()
-        {
-            if (!HasInputAuthority) return;
+                // move player 
+                _rb.AddForce(
+                    transform.TransformDirection(
+                        data.MoveInput.x,
+                        0f,
+                        data.MoveInput.y
+                    ).normalized * MoveForce,
+                    ForceMode.Force);
 
-            var change = -InputManager.Data.LookInput.y * Time.deltaTime;
-            rot = Mathf.Clamp(rot + change, CameraRotMinY, CameraRotMaxY);
-
-            // turn player camera up and down
-            FpCamera.transform.localRotation = Quaternion.Euler(rot, 0f, 0f);
+                // turn player camera up and down
+                var change = -data.LookInput.y * Runner.DeltaTime;
+                lookYRot = Mathf.Clamp(lookYRot + change, CameraRotMinY, CameraRotMaxY);
+                FpCamera.transform.localRotation = Quaternion.Euler(lookYRot, 0f, 0f);
+            }
         }
     }
 }
