@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1265958319378735746}
   - component: {fileID: 4611363414445140174}
   - component: {fileID: 8467771347046284333}
-  - component: {fileID: 2249059675805669476}
   m_Layer: 0
   m_Name: visual
   m_TagString: Untagged
@@ -88,22 +87,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &2249059675805669476
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3610551083804639446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
 --- !u!1 &4796322218466140002
 GameObject:
   m_ObjectHideFlags: 0
@@ -416,7 +399,6 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 3650034825204625014}
   - {fileID: 7871031117671634198}
-  - {fileID: 2249059675805669476}
 --- !u!114 &3650034825204625014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -430,9 +412,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SyncScale: 0
-  SyncParent: 1
+  SyncParent: 0
   _interpolationTarget: {fileID: 4492786681913653871}
-  UsePreciseRotation: 0
+  UsePreciseRotation: 1
   UseRenderSleepThresholds: 1
   RenderThresholds:
     UseEnergy: 1

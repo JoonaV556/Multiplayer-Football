@@ -20,7 +20,7 @@ namespace FootBall
 
         public GameObject FieldCamera;
 
-        private NetworkRunner runner;
+        private NetworkRunner _runner;
 
         private Dictionary<PlayerRef, NetworkObject> PlayerObjects;
 
@@ -32,8 +32,17 @@ namespace FootBall
         private async void StartSession(GameMode mode)
         {
             // create runner
-            runner = gameObject.AddComponent<NetworkRunner>();
-            runner.ProvideInput = true;
+            if (gameObject.TryGetComponent(out NetworkRunner runner))
+            {
+                _runner = runner;
+            }
+            else
+            {
+                _runner = gameObject.AddComponent<NetworkRunner>();
+                TypeLogger.TypeLog(this, "runner not found. created new one instead", 2);
+            }
+
+            _runner.ProvideInput = true;
 
             // create scene info from current scene
             var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
@@ -57,7 +66,7 @@ namespace FootBall
                 args.PlayerCount = 4; // limit to 4 players
             }
 
-            await runner.StartGame(args);
+            await _runner.StartGame(args);
 
             OnSessionStarted();
 
@@ -69,10 +78,10 @@ namespace FootBall
 
         private void OnSessionStarted()
         {
-            if (runner.IsServer)
+            if (_runner.IsServer)
             {
                 // Create football game manager on host 
-                NetworkObject gameManagerObj = runner.Spawn(GameManager, Vector3.zero, Quaternion.identity, runner.LocalPlayer);
+                NetworkObject gameManagerObj = _runner.Spawn(GameManager, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
 
                 // Run game initialization
                 gameManagerObj.GetComponent<GameManager>().InitializeMatch();
@@ -81,7 +90,7 @@ namespace FootBall
 
         private void OnGUI()
         {
-            if (runner == null)
+            if (_runner == null)
             {
                 if (GUI.Button(new Rect(0, 0, 200, 40), "Host"))
                 {
