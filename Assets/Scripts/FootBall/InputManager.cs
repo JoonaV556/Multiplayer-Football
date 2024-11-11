@@ -11,23 +11,44 @@ namespace FootBall
     {
         public InputActionAsset inputActions;
 
+        public static InputData Data = new InputData(); // other objects can read this
+
         [Range(0f, 10f)]
         public float LookVerticalSensitivityMultiplier = 1f;
         [Range(0f, 10f)]
         public float LookHorizontalSensitivityMultiplier = 1f;
 
-        InputAction moveAction;
-        InputAction lookAction;
+        private float
+        maxSensMultiplier = 10f;
 
-        public static InputData Data = new InputData(); // other objects can read this
+        InputAction
+        toggleCursorAction,
+        moveAction,
+        lookAction,
+        toggleMenuAction;
+
+        public void SetHorizontalLookSensitivityMultiplier(float alpha)
+        {
+            var value = Mathf.Clamp(alpha, 0f, 1f);
+            LookHorizontalSensitivityMultiplier = value * maxSensMultiplier;
+        }
+        public void SetVerticalLookSensitivityMultiplier(float alpha)
+        {
+            var value = Mathf.Clamp(alpha, 0f, 1f);
+            LookVerticalSensitivityMultiplier = value * maxSensMultiplier;
+        }
 
         private void OnEnable()
         {
             inputActions.Enable();
 
-            // find actions
+            // get actions from asset
             moveAction = inputActions.FindAction("Move", true);
             lookAction = inputActions.FindAction("Look", true);
+            toggleMenuAction = inputActions.FindAction("ToggleMenu", true);
+            toggleCursorAction = inputActions.FindAction("ToggleCursorLock", true);
+
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void OnDisable()
@@ -47,6 +68,32 @@ namespace FootBall
             );
 
             input.Set(Data);
+        }
+
+        private void Update()
+        {
+            Data.ToggleMenuTriggered = false;
+            // no reason to send menu key data over network so we update it clientside
+            if (toggleMenuAction.WasPressedThisFrame())
+            {
+                Data.ToggleMenuTriggered = true;
+            }
+            if (toggleCursorAction.WasPressedThisFrame())
+            {
+                switch (Cursor.lockState)
+                {
+                    case CursorLockMode.Locked:
+                        Cursor.lockState = CursorLockMode.None;
+                        Cursor.visible = true;
+                        break;
+                    case CursorLockMode.None:
+                        Cursor.lockState = CursorLockMode.Locked;
+                        Cursor.visible = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)

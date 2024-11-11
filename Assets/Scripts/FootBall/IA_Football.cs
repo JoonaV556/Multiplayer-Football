@@ -44,6 +44,24 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ToggleMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""e50ddbee-4792-4750-94f6-ba010e7c6eda"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleCursorLock"",
+                    ""type"": ""Button"",
+                    ""id"": ""3ebfc8c7-a673-482a-b1bb-7ef39a9e6ce5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -112,6 +130,28 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7a528a7b-dce2-448c-abac-219d53813c61"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""349581cc-94f3-4c38-b36b-3d96d13af76c"",
+                    ""path"": ""<Keyboard>/0"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleCursorLock"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -122,6 +162,8 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
         m_PlayerControls = asset.FindActionMap("PlayerControls", throwIfNotFound: true);
         m_PlayerControls_Move = m_PlayerControls.FindAction("Move", throwIfNotFound: true);
         m_PlayerControls_Look = m_PlayerControls.FindAction("Look", throwIfNotFound: true);
+        m_PlayerControls_ToggleMenu = m_PlayerControls.FindAction("ToggleMenu", throwIfNotFound: true);
+        m_PlayerControls_ToggleCursorLock = m_PlayerControls.FindAction("ToggleCursorLock", throwIfNotFound: true);
     }
 
     ~@IA_Football()
@@ -190,12 +232,16 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
     private List<IPlayerControlsActions> m_PlayerControlsActionsCallbackInterfaces = new List<IPlayerControlsActions>();
     private readonly InputAction m_PlayerControls_Move;
     private readonly InputAction m_PlayerControls_Look;
+    private readonly InputAction m_PlayerControls_ToggleMenu;
+    private readonly InputAction m_PlayerControls_ToggleCursorLock;
     public struct PlayerControlsActions
     {
         private @IA_Football m_Wrapper;
         public PlayerControlsActions(@IA_Football wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_PlayerControls_Move;
         public InputAction @Look => m_Wrapper.m_PlayerControls_Look;
+        public InputAction @ToggleMenu => m_Wrapper.m_PlayerControls_ToggleMenu;
+        public InputAction @ToggleCursorLock => m_Wrapper.m_PlayerControls_ToggleCursorLock;
         public InputActionMap Get() { return m_Wrapper.m_PlayerControls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -211,6 +257,12 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @ToggleMenu.started += instance.OnToggleMenu;
+            @ToggleMenu.performed += instance.OnToggleMenu;
+            @ToggleMenu.canceled += instance.OnToggleMenu;
+            @ToggleCursorLock.started += instance.OnToggleCursorLock;
+            @ToggleCursorLock.performed += instance.OnToggleCursorLock;
+            @ToggleCursorLock.canceled += instance.OnToggleCursorLock;
         }
 
         private void UnregisterCallbacks(IPlayerControlsActions instance)
@@ -221,6 +273,12 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @ToggleMenu.started -= instance.OnToggleMenu;
+            @ToggleMenu.performed -= instance.OnToggleMenu;
+            @ToggleMenu.canceled -= instance.OnToggleMenu;
+            @ToggleCursorLock.started -= instance.OnToggleCursorLock;
+            @ToggleCursorLock.performed -= instance.OnToggleCursorLock;
+            @ToggleCursorLock.canceled -= instance.OnToggleCursorLock;
         }
 
         public void RemoveCallbacks(IPlayerControlsActions instance)
@@ -242,5 +300,7 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnToggleMenu(InputAction.CallbackContext context);
+        void OnToggleCursorLock(InputAction.CallbackContext context);
     }
 }

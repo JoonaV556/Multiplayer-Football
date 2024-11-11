@@ -7,6 +7,8 @@ namespace FootBall
     {
         public Vector2 MoveInput;
         public Vector2 LookInput; // delta
+
+        public bool ToggleMenuTriggered;
     }
 
 }
