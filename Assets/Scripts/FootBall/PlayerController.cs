@@ -46,13 +46,18 @@ namespace FootBall
             if (GetInput(out InputData data))
             {
                 // turn player body left and right with look input
-                var bodyRot = transform.rotation.eulerAngles;
-                var newRot = bodyRot + new Vector3(
+                var newRot = new Vector3(
                     0f,
                     data.LookInput.x * Runner.DeltaTime,
                     0f
                     );
-                _rb.MoveRotation(Quaternion.Euler(newRot));
+                // _rb.MoveRotation(Quaternion.Euler(newRot));
+                transform.Rotate(newRot);
+                TypeLog(this, @$"Horizontal look info
+                data: {data.LookInput.x},
+                runner delta {Runner.DeltaTime},
+                applied horizontal rot of {newRot}", 1);
+
 
                 // move player 
                 _rb.AddForce(
@@ -67,6 +72,11 @@ namespace FootBall
                 var change = -data.LookInput.y * Runner.DeltaTime;
                 lookYRot = Mathf.Clamp(lookYRot + change, CameraRotMinY, CameraRotMaxY);
                 FpCamera.transform.localRotation = Quaternion.Euler(lookYRot, 0f, 0f);
+
+                TypeLog(this, @$"Vertical look info
+                data: {-data.LookInput.y},
+                runner delta {Runner.DeltaTime},
+                new y rot {lookYRot}", 1);
             }
         }
     }

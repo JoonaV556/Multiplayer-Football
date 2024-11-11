@@ -1742,8 +1742,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputActions: {fileID: -944628639613478452, guid: 209a8615de236b74e808b0f335de1efa, type: 3}
-  LookVerticalSensitivityMultiplier: 8
-  LookHorizontalSensitivityMultiplier: 8
+  LookVerticalSensitivityMultiplier: 6
+  LookHorizontalSensitivityMultiplier: 6
 --- !u!114 &669750112
 MonoBehaviour:
   m_ObjectHideFlags: 0
