@@ -4,9 +4,13 @@ using static TypeLogger;
 
 namespace FootBall
 {
+    /// <summary>
+    /// Controls player movement & camera & body visibility
+    /// </summary>
     public class PlayerController : NetworkBehaviour
     {
-        public GameObject FpCamera;
+        public GameObject CameraPrefab;
+        public GameObject CameraFollow;
         public GameObject BodyVisual;
 
         [Range(0.1f, 89f)]
@@ -16,9 +20,9 @@ namespace FootBall
 
         public float MoveForce = 2f;
 
-        Rigidbody _rb;
-
         private float lookYRot = 0f;
+
+        Rigidbody _rb;
 
         public override void Spawned()
         {
@@ -28,13 +32,20 @@ namespace FootBall
             // prepare player object clientside
             if (HasInputAuthority)
             {
+                // This player is ours - init stuff on it for us
                 TypeLog(this, "we have input authority", 1);
-                this.FpCamera.SetActive(true); // If this player is us, make us see through the characters first person camera
+                // We need a separate camera object because of jitter caused by rigidbody 
+                // separate object allows us to smooth camera movement
+                this.CameraFollow.SetActive(true);
+                var _cameraObj = Instantiate(CameraPrefab);
+                // init camera controller 
+                _cameraObj.GetComponent<CameraController>().Init(CameraFollow.transform);
             }
             else
             {
+                // This player is not ours - make it visible to us
                 this.BodyVisual.SetActive(true);
-                TypeLog(this, "we activated body visual", 1); // If this is not our player, make it visible to us
+                TypeLog(this, "we activated body visual", 1);
             }
         }
 
@@ -51,13 +62,12 @@ namespace FootBall
                     data.LookInput.x * Runner.DeltaTime,
                     0f
                     );
-                // _rb.MoveRotation(Quaternion.Euler(newRot));
                 transform.Rotate(newRot);
-                TypeLog(this, @$"Horizontal look info
-                data: {data.LookInput.x},
-                runner delta {Runner.DeltaTime},
-                applied horizontal rot of {newRot}", 1);
 
+                // TypeLog(this, @$"Horizontal look info
+                // data: {data.LookInput.x},
+                // runner delta {Runner.DeltaTime},
+                // applied horizontal rot of {newRot}", 1);
 
                 // move player 
                 _rb.AddForce(
@@ -71,12 +81,12 @@ namespace FootBall
                 // turn player camera up and down
                 var change = -data.LookInput.y * Runner.DeltaTime;
                 lookYRot = Mathf.Clamp(lookYRot + change, CameraRotMinY, CameraRotMaxY);
-                FpCamera.transform.localRotation = Quaternion.Euler(lookYRot, 0f, 0f);
+                CameraFollow.transform.localRotation = Quaternion.Euler(lookYRot, 0f, 0f);
 
-                TypeLog(this, @$"Vertical look info
-                data: {-data.LookInput.y},
-                runner delta {Runner.DeltaTime},
-                new y rot {lookYRot}", 1);
+                // TypeLog(this, @$"Vertical look info
+                // data: {-data.LookInput.y},
+                // runner delta {Runner.DeltaTime},
+                // new y rot {lookYRot}", 1);
             }
         }
     }
