@@ -20,9 +20,14 @@ namespace FootBall
 
         public float
         MoveForce = 2f,
-        GroundedSphereRadius = 0.04f;
+        GroundedSphereRadius = 0.04f,
+        JumpForce = 100f,
+        DirectionalJumpForce = 100f,
+        JumpCooldownInSeconds = 1f;
 
         public LayerMask GroundedLayerMask;
+
+        [Networked] public TickTimer jumpCooldownTimer { get; set; }
 
         private float lookYRot = 0f;
 
@@ -89,6 +94,18 @@ namespace FootBall
                 lookYRot = Mathf.Clamp(lookYRot + change, CameraRotMinY, CameraRotMaxY);
                 CameraFollow.transform.localRotation = Quaternion.Euler(lookYRot, 0f, 0f);
 
+                // handle jumping
+                var tryingToJump = data.JumpTriggered;
+                var tryingToDirectionalJump = tryingToJump && data.DirectionalJumpActive;
+                if (tryingToDirectionalJump)
+                {
+                    NormalJump();
+                }
+                else if (tryingToJump)
+                {
+                    DirectionalJump();
+                }
+
                 // TypeLog(this, @$"Vertical look info
                 // data: {-data.LookInput.y},
                 // runner delta {Runner.DeltaTime},
@@ -99,6 +116,31 @@ namespace FootBall
         private void Update()
         {
             UpdateGrounding();
+        }
+
+        private void NormalJump()
+        {
+            TryJump(Vector3.up * JumpForce);
+            TypeLog(this, "Trying normal jump", 1);
+        }
+
+        private void DirectionalJump()
+        {
+
+        }
+
+        private void TryJump(Vector3 force)
+        {
+            if (!Runner.IsServer) return;
+
+            if (!jumpCooldownTimer.ExpiredOrNotRunning(Runner)) return;
+
+            _rb.AddForce(force, ForceMode.Impulse);
+
+            // start cooldown
+            jumpCooldownTimer = TickTimer.CreateFromSeconds(Runner, JumpCooldownInSeconds);
+
+            TypeLog(this, "Jumped", 1);
         }
 
         private void UpdateGrounding()

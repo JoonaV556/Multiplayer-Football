@@ -71,7 +71,9 @@ namespace FootBall
                 rawLookInput.y * LookVerticalSensitivityMultiplier
             );
             Data.JumpTriggered = jumpAction.WasPressedThisFrame();
-            Data.DirectionalJumpTriggered = directionalJumpAction.WasPressedThisFrame();
+            if (Data.JumpTriggered) TypeLogger.TypeLog(this, "Jump key pressed", 1);
+            Data.DirectionalJumpActive = Input.GetKey(KeyCode.LeftShift); // TODO new input system
+            if (Data.DirectionalJumpActive) TypeLogger.TypeLog(this, "dir jump key is down", 1);
 
             input.Set(Data);
         }
