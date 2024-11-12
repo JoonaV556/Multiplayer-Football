@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1265958319378735746}
   - component: {fileID: 4611363414445140174}
   - component: {fileID: 8467771347046284333}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 2494754265096845411}
   - component: {fileID: 8206418909793470485}
   - component: {fileID: 514271518540681311}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: eyes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -182,7 +182,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4492786681913653871}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: interpolationRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -215,7 +215,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5230810786937472727}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: cameraFollow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -251,7 +251,7 @@ GameObject:
   - component: {fileID: 7871031117671634198}
   - component: {fileID: 6611896133240249461}
   - component: {fileID: 5238263696009450678}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -333,6 +333,11 @@ MonoBehaviour:
   CameraRotMaxY: 89
   CameraRotMinY: -89
   MoveForce: 60
+  GroundedSphereRadius: 0.04
+  GroundedLayerMask:
+    serializedVersion: 2
+    m_Bits: 55
+  grounded: 0
 --- !u!54 &6611896133240249461
 Rigidbody:
   m_ObjectHideFlags: 0

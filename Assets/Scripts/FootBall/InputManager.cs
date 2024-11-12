@@ -25,7 +25,9 @@ namespace FootBall
         toggleCursorAction,
         moveAction,
         lookAction,
-        toggleMenuAction;
+        toggleMenuAction,
+        jumpAction,
+        directionalJumpAction;
 
         public void SetHorizontalLookSensitivityMultiplier(float alpha)
         {
@@ -47,6 +49,8 @@ namespace FootBall
             lookAction = inputActions.FindAction("Look", true);
             toggleMenuAction = inputActions.FindAction("ToggleMenu", true);
             toggleCursorAction = inputActions.FindAction("ToggleCursorLock", true);
+            jumpAction = inputActions.FindAction("Jump", true);
+            directionalJumpAction = inputActions.FindAction("DirectionalJump", true);
 
             Cursor.lockState = CursorLockMode.Locked;
         }
@@ -66,6 +70,8 @@ namespace FootBall
                 rawLookInput.x * LookHorizontalSensitivityMultiplier,
                 rawLookInput.y * LookVerticalSensitivityMultiplier
             );
+            Data.JumpTriggered = jumpAction.WasPressedThisFrame();
+            Data.DirectionalJumpTriggered = directionalJumpAction.WasPressedThisFrame();
 
             input.Set(Data);
         }

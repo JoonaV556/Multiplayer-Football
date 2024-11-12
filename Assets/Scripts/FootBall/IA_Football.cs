@@ -62,6 +62,24 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""4a813b9c-6c89-4d3b-b6f7-98b2ce6e852d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DirectionalJump"",
+                    ""type"": ""Button"",
+                    ""id"": ""f5109561-7c66-4a38-b33b-728a66209afd"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -152,6 +170,28 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
                     ""action"": ""ToggleCursorLock"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b1d10839-bbcc-46f8-8f5f-1c42b967f937"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""26a33ad0-85d6-4a73-a3fc-feca502d5350"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DirectionalJump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -164,6 +204,8 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
         m_PlayerControls_Look = m_PlayerControls.FindAction("Look", throwIfNotFound: true);
         m_PlayerControls_ToggleMenu = m_PlayerControls.FindAction("ToggleMenu", throwIfNotFound: true);
         m_PlayerControls_ToggleCursorLock = m_PlayerControls.FindAction("ToggleCursorLock", throwIfNotFound: true);
+        m_PlayerControls_Jump = m_PlayerControls.FindAction("Jump", throwIfNotFound: true);
+        m_PlayerControls_DirectionalJump = m_PlayerControls.FindAction("DirectionalJump", throwIfNotFound: true);
     }
 
     ~@IA_Football()
@@ -234,6 +276,8 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerControls_Look;
     private readonly InputAction m_PlayerControls_ToggleMenu;
     private readonly InputAction m_PlayerControls_ToggleCursorLock;
+    private readonly InputAction m_PlayerControls_Jump;
+    private readonly InputAction m_PlayerControls_DirectionalJump;
     public struct PlayerControlsActions
     {
         private @IA_Football m_Wrapper;
@@ -242,6 +286,8 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
         public InputAction @Look => m_Wrapper.m_PlayerControls_Look;
         public InputAction @ToggleMenu => m_Wrapper.m_PlayerControls_ToggleMenu;
         public InputAction @ToggleCursorLock => m_Wrapper.m_PlayerControls_ToggleCursorLock;
+        public InputAction @Jump => m_Wrapper.m_PlayerControls_Jump;
+        public InputAction @DirectionalJump => m_Wrapper.m_PlayerControls_DirectionalJump;
         public InputActionMap Get() { return m_Wrapper.m_PlayerControls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -263,6 +309,12 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
             @ToggleCursorLock.started += instance.OnToggleCursorLock;
             @ToggleCursorLock.performed += instance.OnToggleCursorLock;
             @ToggleCursorLock.canceled += instance.OnToggleCursorLock;
+            @Jump.started += instance.OnJump;
+            @Jump.performed += instance.OnJump;
+            @Jump.canceled += instance.OnJump;
+            @DirectionalJump.started += instance.OnDirectionalJump;
+            @DirectionalJump.performed += instance.OnDirectionalJump;
+            @DirectionalJump.canceled += instance.OnDirectionalJump;
         }
 
         private void UnregisterCallbacks(IPlayerControlsActions instance)
@@ -279,6 +331,12 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
             @ToggleCursorLock.started -= instance.OnToggleCursorLock;
             @ToggleCursorLock.performed -= instance.OnToggleCursorLock;
             @ToggleCursorLock.canceled -= instance.OnToggleCursorLock;
+            @Jump.started -= instance.OnJump;
+            @Jump.performed -= instance.OnJump;
+            @Jump.canceled -= instance.OnJump;
+            @DirectionalJump.started -= instance.OnDirectionalJump;
+            @DirectionalJump.performed -= instance.OnDirectionalJump;
+            @DirectionalJump.canceled -= instance.OnDirectionalJump;
         }
 
         public void RemoveCallbacks(IPlayerControlsActions instance)
@@ -302,5 +360,7 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnToggleMenu(InputAction.CallbackContext context);
         void OnToggleCursorLock(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
+        void OnDirectionalJump(InputAction.CallbackContext context);
     }
 }

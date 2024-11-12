@@ -9,6 +9,8 @@ namespace FootBall
         public Vector2 LookInput; // delta
 
         public bool ToggleMenuTriggered;
+        public bool JumpTriggered;
+        public bool DirectionalJumpTriggered;
     }
 
 }

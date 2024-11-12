@@ -18,9 +18,15 @@ namespace FootBall
         [Range(-0.1f, -89f)]
         public float CameraRotMinY = -89f;
 
-        public float MoveForce = 2f;
+        public float
+        MoveForce = 2f,
+        GroundedSphereRadius = 0.04f;
+
+        public LayerMask GroundedLayerMask;
 
         private float lookYRot = 0f;
+
+        public bool grounded;
 
         Rigidbody _rb;
 
@@ -88,6 +94,23 @@ namespace FootBall
                 // runner delta {Runner.DeltaTime},
                 // new y rot {lookYRot}", 1);
             }
+        }
+
+        private void Update()
+        {
+            UpdateGrounding();
+        }
+
+        private void UpdateGrounding()
+        {
+            // update grounded status
+            var origin = transform.position;
+            grounded = Physics.CheckSphere(
+                origin,
+                GroundedSphereRadius,
+                GroundedLayerMask,
+                QueryTriggerInteraction.Ignore
+                );
         }
     }
 }
