@@ -26,6 +26,8 @@ namespace FootBall
         JumpCooldownInSeconds = 1f,
         ExtraGravityWhileInAir = 30f;
 
+        public Vector3 DirectionalJumpExtraAngle = new Vector3(-45, 0f, 0f);
+
         public LayerMask GroundedLayerMask;
 
         [Networked] public TickTimer jumpCooldownTimer { get; set; }
@@ -100,11 +102,11 @@ namespace FootBall
                 var tryingToDirectionalJump = tryingToJump && data.DirectionalJumpActive;
                 if (tryingToDirectionalJump)
                 {
-                    NormalJump();
+                    DirectionalJump();
                 }
                 else if (tryingToJump)
                 {
-                    DirectionalJump();
+                    NormalJump();
                 }
 
                 // apply extra downward force while in air
@@ -128,13 +130,13 @@ namespace FootBall
         private void NormalJump()
         {
             TryJump(Vector3.up * JumpForce);
-            TypeLog(this, "Trying normal jump", 1);
         }
 
         private void DirectionalJump()
         {
-            TryJump(Vector3.up * DirectionalJumpForce);
-            TypeLog(this, "Trying normal jump", 1);
+            var direction = (transform.forward + Vector3.up).normalized;
+            TryJump(direction * DirectionalJumpForce);
+            TypeLog(this, "Trying directional jump", 1);
         }
 
         private void TryJump(Vector3 force)

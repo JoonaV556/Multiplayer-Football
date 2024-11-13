@@ -63,7 +63,7 @@ namespace FootBall
         }
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
-        {   
+        {
             // reset before each loop
             Data.JumpTriggered = false;
 
@@ -83,7 +83,7 @@ namespace FootBall
             }
 
             Data.DirectionalJumpActive = Input.GetKey(KeyCode.LeftShift); // TODO new input system
-            if (Data.DirectionalJumpActive) TypeLogger.TypeLog(this, "dir jump key is down", 1);
+            TypeLogger.TypeLog(this, $"directional jump input: {Data.DirectionalJumpActive}", 1);
 
             input.Set(Data);
         }
@@ -94,7 +94,6 @@ namespace FootBall
             if (jumpAction.WasPressedThisFrame())
             {
                 jumpPending = true;
-                TypeLogger.TypeLog(this, "Jump key pressed", 1);
             }
 
             Data.ToggleMenuTriggered = false;
