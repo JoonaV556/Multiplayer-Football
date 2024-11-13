@@ -23,7 +23,8 @@ namespace FootBall
         GroundedSphereRadius = 0.04f,
         JumpForce = 100f,
         DirectionalJumpForce = 100f,
-        JumpCooldownInSeconds = 1f;
+        JumpCooldownInSeconds = 1f,
+        ExtraGravityWhileInAir = 30f;
 
         public LayerMask GroundedLayerMask;
 
@@ -106,6 +107,12 @@ namespace FootBall
                     DirectionalJump();
                 }
 
+                // apply extra downward force while in air
+                if (!grounded)
+                {
+                    _rb.AddForce(Vector3.down * ExtraGravityWhileInAir);
+                }
+
                 // TypeLog(this, @$"Vertical look info
                 // data: {-data.LookInput.y},
                 // runner delta {Runner.DeltaTime},
@@ -126,14 +133,29 @@ namespace FootBall
 
         private void DirectionalJump()
         {
-
+            TryJump(Vector3.up * DirectionalJumpForce);
+            TypeLog(this, "Trying normal jump", 1);
         }
 
         private void TryJump(Vector3 force)
         {
-            if (!Runner.IsServer) return;
+            if (!Runner.IsServer)
+            {
+                TypeLog(this, "not server, cannot jump", 1);
+                return;
+            }
 
-            if (!jumpCooldownTimer.ExpiredOrNotRunning(Runner)) return;
+            if (!jumpCooldownTimer.ExpiredOrNotRunning(Runner))
+            {
+                TypeLog(this, "jump cooldown not expired or is currently running, cannot jump", 1);
+                return;
+            }
+
+            if (!grounded)
+            {
+                TypeLog(this, "cannot jummp, not on ground", 1);
+                return;
+            }
 
             _rb.AddForce(force, ForceMode.Impulse);
 

@@ -29,6 +29,8 @@ namespace FootBall
         jumpAction,
         directionalJumpAction;
 
+        private bool jumpPending = false;
+
         public void SetHorizontalLookSensitivityMultiplier(float alpha)
         {
             var value = Mathf.Clamp(alpha, 0f, 1f);
@@ -61,7 +63,10 @@ namespace FootBall
         }
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
-        {
+        {   
+            // reset before each loop
+            Data.JumpTriggered = false;
+
             // send input over to server
             Data.MoveInput = moveAction.ReadValue<Vector2>();
             var rawLookInput = lookAction.ReadValue<Vector2>();
@@ -70,8 +75,13 @@ namespace FootBall
                 rawLookInput.x * LookHorizontalSensitivityMultiplier,
                 rawLookInput.y * LookVerticalSensitivityMultiplier
             );
-            Data.JumpTriggered = jumpAction.WasPressedThisFrame();
-            if (Data.JumpTriggered) TypeLogger.TypeLog(this, "Jump key pressed", 1);
+
+            if (jumpPending)
+            {
+                Data.JumpTriggered = true;
+                jumpPending = false;
+            }
+
             Data.DirectionalJumpActive = Input.GetKey(KeyCode.LeftShift); // TODO new input system
             if (Data.DirectionalJumpActive) TypeLogger.TypeLog(this, "dir jump key is down", 1);
 
@@ -80,6 +90,13 @@ namespace FootBall
 
         private void Update()
         {
+            // we have to detect key presses in update and send them to server in OnInput since OnInput is too infrequent
+            if (jumpAction.WasPressedThisFrame())
+            {
+                jumpPending = true;
+                TypeLogger.TypeLog(this, "Jump key pressed", 1);
+            }
+
             Data.ToggleMenuTriggered = false;
             // no reason to send menu key data over network so we update it clientside
             if (toggleMenuAction.WasPressedThisFrame())
