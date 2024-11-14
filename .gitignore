@@ -72,5 +72,8 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # test scenes
-/[Aa]ssets/[Ss]cenes/[Tt]esting]
+/[Aa]ssets/[Ss]cenes/[Tt]esting/
 
+Assets/Scenes/Testing/Tests.unity
+Assets/Scenes/Testing.meta
+Assets/Scenes/Testing/Tests.unity.meta

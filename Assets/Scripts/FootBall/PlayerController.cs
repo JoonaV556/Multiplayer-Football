@@ -13,6 +13,8 @@ namespace FootBall
         public GameObject CameraFollow;
         public GameObject BodyVisual;
 
+        [Space(20)]
+        [Header("Looking")]
         [Range(0.1f, 89f)]
         public float CameraRotMaxY = 89f;
         [Range(-0.1f, -89f)]
@@ -21,12 +23,14 @@ namespace FootBall
         public float
         MoveForce = 2f,
         GroundedSphereRadius = 0.04f,
-        JumpForce = 100f,
-        DirectionalJumpForce = 100f,
-        JumpCooldownInSeconds = 1f,
         ExtraGravityWhileInAir = 30f;
 
-        public Vector3 DirectionalJumpExtraAngle = new Vector3(-45, 0f, 0f);
+        [Space(20)]
+        [Header("Jumping")]
+        public float DirectionalJumpUpWardsAngle = 47f;
+        public float JumpForce = 100f;
+        public float DirectionalJumpForce = 100f;
+        public float JumpCooldownInSeconds = 1f;
 
         public LayerMask GroundedLayerMask;
 
@@ -134,8 +138,10 @@ namespace FootBall
 
         private void DirectionalJump()
         {
-            var direction = (transform.forward + Vector3.up).normalized;
-            TryJump(direction * DirectionalJumpForce);
+            //var direction = (transform.forward + Vector3.up).normalized;
+            var alpha = DirectionalJumpUpWardsAngle / 90f;
+            var dir = Vector3.Lerp(transform.forward, Vector3.up, alpha);
+            TryJump(dir.normalized * DirectionalJumpForce);
             TypeLog(this, "Trying directional jump", 1);
         }
 

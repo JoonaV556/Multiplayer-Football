@@ -11,7 +11,7 @@ namespace FootBall
     {
         public InputActionAsset inputActions;
 
-        public static InputData Data = new InputData(); // other objects can read this
+        public static InputData Data = new InputData(); // input data struct which is updated continuously, other systems can read input from here
 
         [Range(0f, 10f)]
         public float LookVerticalSensitivityMultiplier = 1f;
@@ -83,7 +83,6 @@ namespace FootBall
             }
 
             Data.DirectionalJumpActive = Input.GetKey(KeyCode.LeftShift); // TODO new input system
-            TypeLogger.TypeLog(this, $"directional jump input: {Data.DirectionalJumpActive}", 1);
 
             input.Set(Data);
         }
