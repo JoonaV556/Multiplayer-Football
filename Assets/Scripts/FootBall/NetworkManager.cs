@@ -22,7 +22,9 @@ namespace FootBall
 
         private NetworkRunner _runner;
 
-        private Dictionary<PlayerRef, NetworkObject> PlayerObjects;
+        private Dictionary<PlayerRef, PlayerData> PlayerDatas; // tracks data related to each player
+
+        public static event Action<PlayerData> OnAfterPlayerJoined, OnAfterPlayerLeft;
 
         /// <summary>
         /// Starts new network session by hosting or joining existing one
@@ -158,10 +160,19 @@ namespace FootBall
                     player
                     );
 
-                if (PlayerObjects == null)
-                    PlayerObjects = new();
+                if (PlayerDatas == null)
+                    PlayerDatas = new();
 
-                PlayerObjects.Add(player, playerObject);
+                var data = new PlayerData
+                {
+                    Ref = player,
+                    Object = playerObject,
+                    Team = Team.none, // teaming is done by gamemanager, which runs on host only
+                };
+
+                PlayerDatas.Add(player, data);
+
+                OnAfterPlayerJoined?.Invoke(data);
             }
 
             // Disable overview camera when player spawns - player will see game through first person
@@ -176,9 +187,10 @@ namespace FootBall
             // remove player objects
             if (runner.IsServer)
             {
-                var playerObject = PlayerObjects[player];
-                PlayerObjects.Remove(player);
-                runner.Despawn(playerObject);
+                runner.Despawn(PlayerDatas[player].Object);
+                var data = PlayerDatas[player];
+                PlayerDatas.Remove(player);
+                OnAfterPlayerLeft?.Invoke(data);
             }
         }
 

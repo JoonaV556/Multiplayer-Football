@@ -27,6 +27,7 @@ namespace FootBall
 
         [Space(20)]
         [Header("Jumping")]
+        [Range(0.1f, 89f)]
         public float DirectionalJumpUpWardsAngle = 47f;
         public float JumpForce = 100f;
         public float DirectionalJumpForce = 100f;

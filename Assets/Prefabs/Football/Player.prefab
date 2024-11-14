@@ -334,11 +334,11 @@ MonoBehaviour:
   CameraRotMinY: -89
   MoveForce: 60
   GroundedSphereRadius: 0.04
-  JumpForce: 20
+  ExtraGravityWhileInAir: 55
+  DirectionalJumpUpWardsAngle: 50
+  JumpForce: 30
   DirectionalJumpForce: 35
   JumpCooldownInSeconds: 1
-  ExtraGravityWhileInAir: 55
-  DirectionalJumpExtraAngle: {x: -45, y: 0, z: 0}
   GroundedLayerMask:
     serializedVersion: 2
     m_Bits: 55
