@@ -1,8 +1,19 @@
+using System;
+using System.Linq;
+using ExitGames.Client.Photon;
 using Fusion;
 using UnityEngine;
 
 namespace FootBall
 {
+    [Serializable]
+    public class SpawnPoint
+    {
+        public PlayerData _OccupyingPlayer;
+        public Transform _Transform;
+        public Team _Side;
+    }
+
     /// <summary>
     /// Manages football game-related logic. All logic runs mainly on host/server
     /// </summary>
@@ -11,6 +22,8 @@ namespace FootBall
         public NetworkObject BallPrefab;
 
         public Vector3 BallSpawnPosition = Vector3.zero;
+
+        public SpawnPoint[] SpawnPoints;
 
         private int
         TeamRedSize = 0,
@@ -44,6 +57,15 @@ namespace FootBall
             // assign team
             data.Team = DecideTeam();
 
+            // assign spawn point & place player there
+            var viableSpawns = from spawn in SpawnPoints
+                               where spawn._Side == data.Team && spawn._OccupyingPlayer == null
+                               select spawn;
+            var point = viableSpawns.First();
+            point._OccupyingPlayer = data;
+            data.Object.transform.position = point._Transform.position;
+            data.Object.transform.forward = point._Transform.forward;
+
             // change color based on team
 
             // place on team spawn position
@@ -74,6 +96,8 @@ namespace FootBall
         private void HandlePlayerLeft(PlayerData data)
         {
             if (!HasStateAuthority) return;
+
+            // unassign spawn point
 
             // update teaming status
         }
