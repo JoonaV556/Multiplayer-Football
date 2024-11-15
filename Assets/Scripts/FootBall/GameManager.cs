@@ -67,9 +67,26 @@ namespace FootBall
             data.Object.transform.forward = point._Transform.forward;
 
             // change color based on team
+            // data.Object.GetComponent<PlayerColorHandler>().Color = data.Team;
+            throw new NotImplementedException();
+            // update object colors 
+        }
 
-            // place on team spawn position
+        private void HandlePlayerLeft(PlayerData data)
+        {
+            if (!HasStateAuthority) return;
 
+            // unassign spawn point
+            var point = (from spawn in SpawnPoints
+                         where spawn._OccupyingPlayer.Ref == data.Ref
+                         select spawn).FirstOrDefault();
+            if (point != null)
+            {
+                point._OccupyingPlayer = null;
+            }
+
+            // update teaming status
+            data.Team = Team.none;
         }
 
         /// <summary>
@@ -91,15 +108,6 @@ namespace FootBall
             {
                 return Team.red;
             }
-        }
-
-        private void HandlePlayerLeft(PlayerData data)
-        {
-            if (!HasStateAuthority) return;
-
-            // unassign spawn point
-
-            // update teaming status
         }
     }
 }
