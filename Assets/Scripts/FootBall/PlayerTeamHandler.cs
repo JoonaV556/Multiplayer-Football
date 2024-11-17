@@ -1,3 +1,4 @@
+using System;
 using Fusion;
 using UnityEngine;
 
@@ -11,17 +12,19 @@ namespace FootBall
         public MeshRenderer[] ColorRenderers;
         [Networked, HideInInspector] public Team Team { get; set; }
 
+        public static event Action<Team> OnLocalPlayerTeamChanged;
+
         private Team localTeam = Team.none;
 
         public override void FixedUpdateNetwork()
         {
             if (localTeam != Team)
             {
-                UpdateColor(Team);
+                UpdateTeam(Team);
             }
         }
 
-        private void UpdateColor(Team team)
+        private void UpdateTeam(Team team)
         {
             localTeam = team;
             var color = Colors.TeamColors[team];
@@ -30,6 +33,11 @@ namespace FootBall
                 renderer.material.color = color;
             }
             TypeLogger.TypeLog(this, "changed players color", 1);
+
+            if (HasInputAuthority)
+            {
+                OnLocalPlayerTeamChanged?.Invoke(team);
+            }
         }
     }
 }
