@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ExitGames.Client.Photon;
 using Fusion;
@@ -19,6 +20,12 @@ namespace FootBall
     /// </summary>
     public class GameManager : NetworkBehaviour
     {
+        private struct PendingTeamChange
+        {
+            public PlayerTeamHandler _handler;
+            public Team _team;
+        }
+
         public NetworkObject BallPrefab;
 
         public Vector3 BallSpawnPosition = Vector3.zero;
@@ -28,6 +35,8 @@ namespace FootBall
         private int
         TeamRedSize = 0,
         TeamBlueSize = 0;
+
+        private List<PendingTeamChange> teamChangeQueue = new();
 
         public void InitializeMatch()
         {
@@ -50,6 +59,16 @@ namespace FootBall
             NetworkManager.OnAfterPlayerLeft -= HandlePlayerLeft;
         }
 
+        public override void FixedUpdateNetwork()
+        {
+            // process team changes
+            foreach (var change in teamChangeQueue)
+            {
+                change._handler.Team = change._team;
+            }
+            teamChangeQueue.Clear();
+        }
+
         private void HandlePlayerJoined(PlayerData data)
         {
             if (!HasStateAuthority) return;
@@ -67,9 +86,17 @@ namespace FootBall
             data.Object.transform.forward = point._Transform.forward;
 
             // change color based on team
-            // data.Object.GetComponent<PlayerColorHandler>().Color = data.Team;
-            throw new NotImplementedException();
-            // update object colors 
+            var color = Colors.TeamColors[data.Team];
+
+            // queue color change - these play around with networked properties so they have to be processed in networkupdate
+            var teamChange = new PendingTeamChange()
+            {
+                _handler = data.Object.GetComponent<PlayerTeamHandler>(),
+                _team = data.Team
+            };
+            teamChangeQueue.Add(teamChange);
+
+            TypeLogger.TypeLog(this, "Assigned team and spawn point for joined player", 1);
         }
 
         private void HandlePlayerLeft(PlayerData data)
@@ -86,7 +113,8 @@ namespace FootBall
             }
 
             // update teaming status
-            data.Team = Team.none;
+
+            TypeLogger.TypeLog(this, "Unassigned spawn point and team from left player", 1);
         }
 
         /// <summary>

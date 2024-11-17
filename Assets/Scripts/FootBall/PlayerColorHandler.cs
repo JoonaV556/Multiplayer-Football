@@ -3,42 +3,33 @@ using UnityEngine;
 
 namespace FootBall
 {
-    public class PlayerColorHandler : NetworkBehaviour
+    /// <summary>
+    /// Handles team-change related behavior for individual player objects
+    /// </summary>
+    public class PlayerTeamHandler : NetworkBehaviour
     {
         public MeshRenderer[] ColorRenderers;
-        [Networked, HideInInspector] public Team Color { get; set; }
+        [Networked, HideInInspector] public Team Team { get; set; }
 
-        private Team localColor = Team.none;
+        private Team localTeam = Team.none;
 
         public override void FixedUpdateNetwork()
         {
-            if (localColor != Color)
+            if (localTeam != Team)
             {
-                UpdateColor(Color);
+                UpdateColor(Team);
             }
         }
 
-        private void UpdateColor(Team Color)
+        private void UpdateColor(Team team)
         {
-            localColor = Color;
-            var color = new Color();
-            switch (Color)
-            {
-                case Team.red:
-                    color = Colors.TeamRedColor;
-                    break;
-                case Team.blue:
-                    color = Colors.TeamBlueColor;
-                    break;
-                default:
-                    color = UnityEngine.Color.black;
-                    break;
-            }
-
+            localTeam = team;
+            var color = Colors.TeamColors[team];
             foreach (var renderer in ColorRenderers)
             {
                 renderer.material.color = color;
             }
+            TypeLogger.TypeLog(this, "changed players color", 1);
         }
     }
 }
