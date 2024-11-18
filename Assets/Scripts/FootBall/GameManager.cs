@@ -96,6 +96,16 @@ namespace FootBall
             };
             teamChangeQueue.Add(teamChange);
 
+            switch (data.Team)
+            {
+                case Team.blue:
+                    TeamBlueSize++;
+                    break;
+                case Team.red:
+                    TeamRedSize++;
+                    break;
+            }
+
             TypeLogger.TypeLog(this, "Assigned team and spawn point for joined player", 1);
         }
 
@@ -110,6 +120,16 @@ namespace FootBall
             if (point != null)
             {
                 point._OccupyingPlayer = null;
+            }
+
+            switch (data.Team)
+            {
+                case Team.blue:
+                    TeamBlueSize--;
+                    break;
+                case Team.red:
+                    TeamRedSize--;
+                    break;
             }
 
             // update teaming status
