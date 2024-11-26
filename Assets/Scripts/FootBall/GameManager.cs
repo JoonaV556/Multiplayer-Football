@@ -65,6 +65,7 @@ namespace FootBall
             foreach (var change in teamChangeQueue)
             {
                 change._handler.Team = change._team;
+                TypeLogger.TypeLog(this, "Processed team change", 1);
             }
             teamChangeQueue.Clear();
         }
