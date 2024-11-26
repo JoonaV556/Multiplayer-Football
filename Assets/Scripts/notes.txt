@@ -16,9 +16,19 @@ Input manager responsibilities
         - IInputConsumer
             - ConsumeInput
 
+networked properties
+---------------------------------------------------
+- value can only be set by StateAuthority  
 
-InputEnvoy
-    - monobehavior script attached to gameObject
-    - on enable 
-        - gathers and sends a list of input users to Input manager
-    - on disable     
+- detect changes locally by comparing local value to synced value in Update
+
+//react to changed networked var locally 
+
+[Networked] var Value;
+private var localValue;
+
+Update() {
+    if (localValue != Value) {
+        log("synced value has been changed over network");
+    }
+}

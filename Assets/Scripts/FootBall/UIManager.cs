@@ -22,6 +22,7 @@ namespace Football
 
         private void UpdateTeamUI(Team team)
         {
+            TypeLogger.TypeLog(this, $"Changed team UI color to {team.ToString()}", 1);
             TeamUiImage.gameObject.SetActive(true);
             TeamUiImage.color = Colors.TeamColors[team];
         }
