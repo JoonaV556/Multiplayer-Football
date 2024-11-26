@@ -16,10 +16,17 @@ namespace FootBall
     }
 
     /// <summary>
-    /// Manages football game-related logic. All logic runs mainly on host/server
+    /// Manages football game-related logic. Spawned for all players but management code runs only on server 
     /// </summary>
     public class GameManager : NetworkBehaviour
     {
+        /*
+        Responsibilities:
+        - Team handling for players
+        - Updating game state/phases (warmup, match etc.)
+        - Handling ball, goals etc.
+        */
+
         private struct PendingTeamChange
         {
             public PlayerTeamHandler _handler;

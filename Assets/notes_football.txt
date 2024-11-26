@@ -1,0 +1,17 @@
+just some notes for planning football game logic
+
+game phases
+1. warmup
+    -players can freely score goals
+    -ends when all players have stood in central circle for long enough
+2. match
+    round loop:
+    - players spawn in spawn positions & movement is locked
+    - Countdown begins and round starts on 0
+    - round begin
+        -player movement is unlocked
+        -ball is spawned in center
+    - players try to score goal
+    - goal is scored
+        - arena score ui is updated
+        - 
