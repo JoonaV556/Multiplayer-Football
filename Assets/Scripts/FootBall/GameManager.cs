@@ -196,7 +196,7 @@ namespace FootBall
     */
     public interface IGamePhase
     {
-        public void OnBegun(GameManager manager);
+        public void OnBegun();
 
         public void Update();
 

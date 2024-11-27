@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 namespace FootBall
 {
     /// <summary>
-    /// Manages general network-related behavior on clients & host/server
+    /// Allows clients and host to join or host a new game session. instantiates gamemanager for host 
     /// </summary>
     public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
