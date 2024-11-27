@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExitGames.Client.Photon;
 using Fusion;
 using UnityEngine;
 
@@ -27,11 +26,7 @@ namespace FootBall
         - Handling ball, goals etc.
         */
 
-        private struct PendingTeamChange
-        {
-            public PlayerTeamHandler _handler;
-            public Team _team;
-        }
+        public static GameManager Instance;
 
         public NetworkObject BallPrefab;
 
@@ -43,6 +38,12 @@ namespace FootBall
         TeamRedSize = 0,
         TeamBlueSize = 0;
 
+        private struct PendingTeamChange
+        {
+            public PlayerTeamHandler _handler;
+            public Team _team;
+        }
+
         private List<PendingTeamChange> teamChangeQueue = new();
 
         public void InitializeMatch()
@@ -51,6 +52,19 @@ namespace FootBall
             {
                 // spawn football
                 Runner.Spawn(BallPrefab, BallSpawnPosition);
+            }
+        }
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                TypeLogger.TypeLog(this, "detected & destroying duplicate gamemanager instance", 3);
+                Destroy(this);
             }
         }
 
@@ -164,6 +178,53 @@ namespace FootBall
             {
                 return Team.red;
             }
+        }
+    }
+
+    /*
+        phases are specific stages of game 
+        manager runs through each game phase in order
+        kind of like game states
+
+        lifecycle of phase:
+        - Phase is started
+        - Phase updates continuosly
+        - phase is ended when its IsCompleted returns true
+
+        phase is considered complete when IsComplete returns true
+            - once complete, manager continues to next phase
+    */
+    public interface IGamePhase
+    {
+        public void OnBegun(GameManager manager);
+
+        public void Update();
+
+        public bool IsComplete();
+    }
+
+    public class WarmupPhase : IGamePhase
+    {
+        private bool playersReady = false;
+
+        public void OnBegun()
+        {
+            // place all players in spawn positions
+
+            // drop ball in center
+        }
+
+        public void Update()
+        {
+
+        }
+
+        public bool IsComplete()
+        {
+            // conditions 
+            // atleast 2 players present 
+            // all players have stood in ready pos for enough time
+            return false;
         }
     }
 }

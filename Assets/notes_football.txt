@@ -4,7 +4,14 @@ GAME PHASES:
 
 1. warmup
     {
-        -players can freely score goals
+        onbegin
+        - players are placed in team spawn positions 
+        - ball placed center
+        update
+        - players can freely score goals
+        - on goal
+            - sfx 
+            - ball respawns at center after 1.5secs
         -ends when all players have stood in central circle for long enough
     }
     
