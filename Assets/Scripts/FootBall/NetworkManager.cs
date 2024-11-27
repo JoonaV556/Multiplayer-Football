@@ -8,13 +8,11 @@ using UnityEngine.SceneManagement;
 namespace FootBall
 {
     /// <summary>
-    /// Allows clients and host to join or host a new game session. instantiates gamemanager for host 
+    /// Allows players to join or host a new game session. instantiates gamemanager for host only
     /// </summary>
     public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         public string SessionName = "FootballTestSession";
-
-        public NetworkObject PlayerPrefab;
 
         public NetworkObject GameManager;
 
@@ -22,9 +20,7 @@ namespace FootBall
 
         private NetworkRunner _runner;
 
-        private Dictionary<PlayerRef, PlayerData> PlayerDatas; // tracks data related to each player
-
-        public static event Action<PlayerData> OnAfterPlayerJoined, OnAfterPlayerLeft;
+        private GameManager gameManager;
 
         /// <summary>
         /// Starts new network session by hosting or joining existing one
@@ -58,7 +54,7 @@ namespace FootBall
             var args = new StartGameArgs()
             {
                 GameMode = mode,
-                SessionName = "FootballTestSession",
+                SessionName = SessionName,
                 Scene = scene,
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
             };
@@ -85,8 +81,15 @@ namespace FootBall
                 // Create football game manager on host 
                 NetworkObject gameManagerObj = _runner.Spawn(GameManager, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
 
+                gameManager = gameManagerObj.GetComponent<GameManager>();
+                _runner.AddCallbacks(
+                    new INetworkRunnerCallbacks[] {
+                        gameManager
+                    }
+                );
+
                 // Run game initialization
-                gameManagerObj.GetComponent<GameManager>().InitializeMatch();
+                gameManager.InitializeMatch();
             }
         }
 
@@ -148,33 +151,6 @@ namespace FootBall
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            TypeLogger.TypeLog(this, "Player joined", 1);
-
-            // Spawn Players
-            if (runner.IsServer)
-            {
-                var playerObject = runner.Spawn(
-                    PlayerPrefab,
-                    Vector3.zero,
-                    Quaternion.identity,
-                    player
-                    );
-
-                if (PlayerDatas == null)
-                    PlayerDatas = new();
-
-                var data = new PlayerData
-                {
-                    Ref = player,
-                    Object = playerObject,
-                    Team = Team.none, // teaming is done by gamemanager, which runs on host only
-                };
-
-                PlayerDatas.Add(player, data);
-
-                OnAfterPlayerJoined?.Invoke(data);
-            }
-
             // Disable overview camera when player spawns - player will see game through first person
             if (runner.LocalPlayer == player)
             {
@@ -184,14 +160,6 @@ namespace FootBall
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            // remove player objects
-            if (runner.IsServer)
-            {
-                runner.Despawn(PlayerDatas[player].Object);
-                var data = PlayerDatas[player];
-                PlayerDatas.Remove(player);
-                OnAfterPlayerLeft?.Invoke(data);
-            }
         }
 
         public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
@@ -216,6 +184,14 @@ namespace FootBall
 
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
+            if (_runner.IsServer)
+            {
+                _runner.RemoveCallbacks(
+                   new INetworkRunnerCallbacks[] {
+                        gameManager
+                   }
+               );
+            }
         }
 
         public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)

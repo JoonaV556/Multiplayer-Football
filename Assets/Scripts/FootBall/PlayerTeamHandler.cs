@@ -26,8 +26,6 @@ namespace FootBall
 
         public override void FixedUpdateNetwork()
         {
-            TypeLogger.TypeLog(this, $"player networked team: {Team}", 1);
-
             if (localTeam != Team)
             {
                 UpdateTeam(Team);

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Fusion;
+using Fusion.Sockets;
 using UnityEngine;
 
 namespace FootBall
@@ -17,16 +18,19 @@ namespace FootBall
     /// <summary>
     /// Manages football game-related logic. Spawned for all players but management code runs only on server 
     /// </summary>
-    public class GameManager : NetworkBehaviour
+    public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks
     {
         /*
         Responsibilities:
+        - Spawning players
         - Team handling for players
         - Updating game state/phases (warmup, match etc.)
         - Handling ball, goals etc.
         */
 
         public static GameManager Instance;
+
+        public NetworkObject PlayerPrefab;
 
         public NetworkObject BallPrefab;
 
@@ -37,6 +41,8 @@ namespace FootBall
         private int
         TeamRedSize = 0,
         TeamBlueSize = 0;
+
+        private Dictionary<PlayerRef, PlayerData> PlayerDatas;
 
         private struct PendingTeamChange
         {
@@ -68,18 +74,6 @@ namespace FootBall
             }
         }
 
-        private void OnEnable()
-        {
-            NetworkManager.OnAfterPlayerJoined += HandlePlayerJoined;
-            NetworkManager.OnAfterPlayerLeft += HandlePlayerLeft;
-        }
-
-        private void OnDisable()
-        {
-            NetworkManager.OnAfterPlayerJoined -= HandlePlayerJoined;
-            NetworkManager.OnAfterPlayerLeft -= HandlePlayerLeft;
-        }
-
         public override void FixedUpdateNetwork()
         {
             // process team changes
@@ -89,46 +83,6 @@ namespace FootBall
                 TypeLogger.TypeLog(this, $"Processed team change for player {change._handler.Object.InputAuthority}. new team: {change._team}", 1);
             }
             teamChangeQueue.Clear();
-        }
-
-        private void HandlePlayerJoined(PlayerData data)
-        {
-            if (!HasStateAuthority) return;
-
-            // assign team
-            data.Team = DecideTeam();
-
-            // assign spawn point & place player there
-            var viableSpawns = from spawn in SpawnPoints
-                               where spawn._Side == data.Team && spawn._OccupyingPlayer == null
-                               select spawn;
-            var point = viableSpawns.First();
-            point._OccupyingPlayer = data;
-            data.Object.transform.position = point._Transform.position;
-            data.Object.transform.forward = point._Transform.forward;
-
-            // change color based on team
-            var color = Colors.TeamColors[data.Team];
-
-            // queue color change - these play around with networked properties so they have to be processed in networkupdate
-            var teamChange = new PendingTeamChange()
-            {
-                _handler = data.Object.GetComponent<PlayerTeamHandler>(),
-                _team = data.Team
-            };
-            teamChangeQueue.Add(teamChange);
-
-            switch (data.Team)
-            {
-                case Team.blue:
-                    TeamBlueSize++;
-                    break;
-                case Team.red:
-                    TeamRedSize++;
-                    break;
-            }
-
-            TypeLogger.TypeLog(this, "Assigned team and spawn point for joined player", 1);
         }
 
         private void HandlePlayerLeft(PlayerData data)
@@ -178,6 +132,148 @@ namespace FootBall
             {
                 return Team.red;
             }
+        }
+
+        public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+        {
+        }
+
+        public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
+        {
+        }
+
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        {
+            TypeLogger.TypeLog(this, "Player joined", 1);
+
+            if (runner.IsServer)
+            {
+                var playerObject = runner.Spawn(
+                    PlayerPrefab,
+                    Vector3.zero,
+                    Quaternion.identity,
+                    player
+                    );
+
+                if (PlayerDatas == null)
+                    PlayerDatas = new();
+
+                // create data to represent player
+                var data = new PlayerData
+                {
+                    Ref = player,
+                    Object = playerObject,
+                    Team = Team.none,
+                };
+
+                PlayerDatas.Add(player, data);
+
+                // assign team
+                data.Team = DecideTeam();
+
+                // assign spawn point & place player there
+                var viableSpawns = from spawn in SpawnPoints
+                                   where spawn._Side == data.Team && spawn._OccupyingPlayer == null
+                                   select spawn;
+                var point = viableSpawns.First();
+                point._OccupyingPlayer = data;
+                data.Object.transform.position = point._Transform.position;
+                data.Object.transform.forward = point._Transform.forward;
+
+                // change color based on team
+                var color = Colors.TeamColors[data.Team];
+
+                // queue color change - these play around with networked properties so they have to be processed in networkupdate
+                var teamChange = new PendingTeamChange()
+                {
+                    _handler = data.Object.GetComponent<PlayerTeamHandler>(),
+                    _team = data.Team
+                };
+                teamChangeQueue.Add(teamChange);
+
+                switch (data.Team)
+                {
+                    case Team.blue:
+                        TeamBlueSize++;
+                        break;
+                    case Team.red:
+                        TeamRedSize++;
+                        break;
+                }
+
+                TypeLogger.TypeLog(this, "Assigned team and spawn point for joined player", 1);
+            }
+        }
+
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        {
+            // remove player objects
+            if (runner.IsServer)
+            {
+                runner.Despawn(PlayerDatas[player].Object);
+                var data = PlayerDatas[player];
+                PlayerDatas.Remove(player);
+            }
+        }
+
+        public void OnInput(NetworkRunner runner, NetworkInput input)
+        {
+        }
+
+        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
+        {
+        }
+
+        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+        {
+        }
+
+        public void OnConnectedToServer(NetworkRunner runner)
+        {
+        }
+
+        public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
+        {
+        }
+
+        public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
+        {
+        }
+
+        public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
+        {
+        }
+
+        public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
+        {
+        }
+
+        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+        {
+        }
+
+        public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
+        {
+        }
+
+        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+        {
+        }
+
+        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
+        {
+        }
+
+        public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
+        {
+        }
+
+        public void OnSceneLoadDone(NetworkRunner runner)
+        {
+        }
+
+        public void OnSceneLoadStart(NetworkRunner runner)
+        {
         }
     }
 
