@@ -1,17 +1,52 @@
-just some notes for planning football game logic
+just some notes for planning football game 
 
-game phases
+GAME PHASES:
+
 1. warmup
-    -players can freely score goals
-    -ends when all players have stood in central circle for long enough
+    {
+        -players can freely score goals
+        -ends when all players have stood in central circle for long enough
+    }
+    
 2. match
-    round loop:
-    - players spawn in spawn positions & movement is locked
-    - Countdown begins and round starts on 0
-    - round begin
-        -player movement is unlocked
-        -ball is spawned in center
-    - players try to score goal
-    - goal is scored
-        - arena score ui is updated
-        - 
+    {
+        round loop:
+            - players spawn in spawn positions & movement is locked
+            - Countdown begins and round starts on 0
+            - round begin
+                -player movement is unlocked
+                -ball is spawned in center
+            - players try to score goal
+            - goal is scored
+                - arena score ui is updated
+                - some victory sounds 
+                - maybe time slowed down
+                - nothing happens for couple of seconds
+    => repeats from start until either team reaches 4 goals
+    }
+
+3. Victory reached
+    {
+        - some cool glorius music
+        - player models stand on field 
+            - winning players have crowns on head
+            - winnnig players jump happily in place
+    }
+
+4. end - rematch or quit 
+    {
+        - each player gets to decide if rematch or quit
+            - if all players vote rematch, restart from phase 1
+            - otherwise all players disconnct & are returned to start menu
+    }
+
+gamemanager
+    - starts game from phase 1 
+    - plays through each phase in order 
+
+    phase interface for phase classes
+    - void onBegin - code to run when phase begins 
+    - void update - code to execute continuously during phase
+    - bool endReached - returns true if phase has ended and manager should switch to next state
+
+
