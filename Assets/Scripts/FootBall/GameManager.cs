@@ -44,6 +44,17 @@ namespace FootBall
 
         private Dictionary<PlayerRef, PlayerData> PlayerDatas;
 
+        private List<IGamePhase> gamePhases = new List<IGamePhase>
+        {
+            new WarmupPhase(),
+            new MatchPhase(),
+            new EndPhase()
+        };
+
+        private IGamePhase currentPhase;
+
+        private bool updatePhase = false;
+
         private struct PendingTeamChange
         {
             public PlayerTeamHandler _handler;
@@ -58,6 +69,9 @@ namespace FootBall
             {
                 // spawn football
                 Runner.Spawn(BallPrefab, BallSpawnPosition);
+
+                // start first game phase
+                updatePhase = true;
             }
         }
 
@@ -76,6 +90,8 @@ namespace FootBall
 
         public override void FixedUpdateNetwork()
         {
+            if (!HasStateAuthority) return;
+
             // process team changes
             foreach (var change in teamChangeQueue)
             {
@@ -83,6 +99,44 @@ namespace FootBall
                 TypeLogger.TypeLog(this, $"Processed team change for player {change._handler.Object.InputAuthority}. new team: {change._team}", 1);
             }
             teamChangeQueue.Clear();
+
+            if (updatePhase) UpdatePhase();
+        }
+
+        // updates game phases
+        private void UpdatePhase()
+        {
+            // start first phase if no pace 
+            if (currentPhase == null)
+            {
+                BeginPhase(gamePhases[0]);
+            }
+
+            if (!currentPhase.IsComplete())
+            {
+                UpdatePhase(currentPhase);
+            }
+            else
+            {
+                EndPhase(currentPhase);
+            }
+        }
+
+        private void BeginPhase(IGamePhase phase)
+        {
+            currentPhase = phase;
+            currentPhase.OnBegun();
+        }
+
+        private void UpdatePhase(IGamePhase phase)
+        {
+            phase.OnUpdate();
+        }
+
+        private void EndPhase(IGamePhase phase)
+        {
+            phase.OnEnd();
+            // todo - switch to next phase
         }
 
         private void HandlePlayerLeft(PlayerData data)
@@ -294,7 +348,9 @@ namespace FootBall
     {
         public void OnBegun();
 
-        public void Update();
+        public void OnUpdate();
+
+        public void OnEnd();
 
         public bool IsComplete();
     }
@@ -310,7 +366,12 @@ namespace FootBall
             // drop ball in center
         }
 
-        public void Update()
+        public void OnUpdate()
+        {
+
+        }
+
+        public void OnEnd()
         {
 
         }
@@ -320,6 +381,52 @@ namespace FootBall
             // conditions 
             // atleast 2 players present 
             // all players have stood in ready pos for enough time
+            return false;
+        }
+    }
+
+    public class MatchPhase : IGamePhase
+    {
+        public void OnBegun()
+        {
+
+        }
+
+        public void OnUpdate()
+        {
+
+        }
+
+        public void OnEnd()
+        {
+
+        }
+
+        public bool IsComplete()
+        {
+            return false;
+        }
+    }
+
+    public class EndPhase : IGamePhase
+    {
+        public void OnBegun()
+        {
+
+        }
+
+        public void OnUpdate()
+        {
+
+        }
+
+        public void OnEnd()
+        {
+
+        }
+
+        public bool IsComplete()
+        {
             return false;
         }
     }
