@@ -143,7 +143,6 @@ namespace FootBall
             var alpha = DirectionalJumpUpWardsAngle / 90f;
             var dir = Vector3.Lerp(transform.forward, Vector3.up, alpha);
             TryJump(dir.normalized * DirectionalJumpForce);
-            TypeLog(this, "Trying directional jump", 1);
         }
 
         private void TryJump(Vector3 force)
@@ -170,8 +169,6 @@ namespace FootBall
 
             // start cooldown
             jumpCooldownTimer = TickTimer.CreateFromSeconds(Runner, JumpCooldownInSeconds);
-
-            TypeLog(this, "Jumped", 1);
         }
 
         private void UpdateGrounding()

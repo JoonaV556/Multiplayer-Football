@@ -14,9 +14,9 @@ namespace FootBall
     {
         public string SessionName = "FootballTestSession";
 
-        public NetworkObject GameManager;
-
         public GameObject FieldCamera;
+
+        public static event Action<NetworkRunner> OnSessionStartedEvent;
 
         private NetworkRunner _runner;
 
@@ -41,6 +41,8 @@ namespace FootBall
             }
 
             _runner.ProvideInput = true;
+
+            _runner.AddCallbacks(GameManager.Instance);
 
             // create scene info from current scene
             var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
@@ -76,21 +78,7 @@ namespace FootBall
 
         private void OnSessionStarted()
         {
-            if (_runner.IsServer)
-            {
-                // Create football game manager on host 
-                NetworkObject gameManagerObj = _runner.Spawn(GameManager, Vector3.zero, Quaternion.identity, _runner.LocalPlayer);
-
-                gameManager = gameManagerObj.GetComponent<GameManager>();
-                _runner.AddCallbacks(
-                    new INetworkRunnerCallbacks[] {
-                        gameManager
-                    }
-                );
-
-                // Run game initialization
-                gameManager.InitializeMatch();
-            }
+            OnSessionStartedEvent?.Invoke(_runner);
         }
 
         private void OnGUI()

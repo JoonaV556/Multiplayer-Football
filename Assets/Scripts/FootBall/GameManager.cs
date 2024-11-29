@@ -4,6 +4,8 @@ using System.Linq;
 using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
+using UnityEngine.Rendering;
+using static TypeLogger;
 
 namespace FootBall
 {
@@ -38,6 +40,8 @@ namespace FootBall
 
         public SpawnPoint[] SpawnPoints;
 
+        private NetworkObject ball;
+
         private int
         TeamRedSize = 0,
         TeamBlueSize = 0;
@@ -63,15 +67,20 @@ namespace FootBall
 
         private List<PendingTeamChange> teamChangeQueue = new();
 
-        public void InitializeMatch()
+        public void InitializeMatch(NetworkRunner runner)
         {
-            if (HasStateAuthority)
+            // run only on server/host
+            if (runner.IsServer)
             {
                 // spawn football
-                Runner.Spawn(BallPrefab, BallSpawnPosition);
+                ball = runner.Spawn(BallPrefab, BallSpawnPosition);
+                TypeLog(this, "Spawned ball", 1);
 
                 // start first game phase
                 updatePhase = true;
+                TypeLog(this, "started phase updates", 1);
+
+                TypeLog(this, "init match on host", 1);
             }
         }
 
@@ -86,6 +95,16 @@ namespace FootBall
                 TypeLogger.TypeLog(this, "detected & destroying duplicate gamemanager instance", 3);
                 Destroy(this);
             }
+        }
+
+        private void OnEnable()
+        {
+            NetworkManager.OnSessionStartedEvent += InitializeMatch;
+        }
+
+        private void OnDisable()
+        {
+            NetworkManager.OnSessionStartedEvent -= InitializeMatch;
         }
 
         public override void FixedUpdateNetwork()
