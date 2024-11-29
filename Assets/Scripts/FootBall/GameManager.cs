@@ -202,61 +202,43 @@ namespace FootBall
 
             if (runner.IsServer)
             {
-                var playerObject = runner.Spawn(
-                    PlayerPrefab,
-                    Vector3.zero,
-                    Quaternion.identity,
-                    player
-                    );
-
-                if (PlayerDatas == null)
-                    PlayerDatas = new();
-
-                // create data to represent player
-                var data = new PlayerData
+                // Allow joining only during warmup or before phases are set
+                var allowJoin = currentPhase is WarmupPhase || currentPhase == null;
+                if (!allowJoin)
                 {
-                    Ref = player,
-                    Object = playerObject,
-                    Team = Team.none,
-                };
-
-                PlayerDatas.Add(player, data);
-
-                // assign team
-                data.Team = DecideTeam();
-
-                // assign spawn point & place player there
-                var viableSpawns = from spawn in SpawnPoints
-                                   where spawn._Side == data.Team && spawn._OccupyingPlayer == null
-                                   select spawn;
-                var point = viableSpawns.First();
-                point._OccupyingPlayer = data;
-                data.Object.transform.position = point._Transform.position;
-                data.Object.transform.forward = point._Transform.forward;
-
-                // change color based on team
-                var color = Colors.TeamColors[data.Team];
-
-                // queue color change - these play around with networked properties so they have to be processed in networkupdate
-                var teamChange = new PendingTeamChange()
-                {
-                    _handler = data.Object.GetComponent<PlayerTeamHandler>(),
-                    _team = data.Team
-                };
-                teamChangeQueue.Add(teamChange);
-
-                switch (data.Team)
-                {
-                    case Team.blue:
-                        TeamBlueSize++;
-                        break;
-                    case Team.red:
-                        TeamRedSize++;
-                        break;
+                    runner.Disconnect(player);
                 }
+
+                // create player 
+                var playerData = CreatePlayerData(runner, player);
+                AssignTeam(playerData);
 
                 TypeLogger.TypeLog(this, "Assigned team and spawn point for joined player", 1);
             }
+        }
+
+        private PlayerData CreatePlayerData(NetworkRunner runner, PlayerRef player)
+        {
+            var playerObject = runner.Spawn(
+                                PlayerPrefab,
+                                Vector3.zero,
+                                Quaternion.identity,
+                                player
+                                );
+
+            if (PlayerDatas == null)
+                PlayerDatas = new();
+
+            // create data to represent player
+            var data = new PlayerData
+            {
+                Ref = player,
+                Object = playerObject,
+                Team = Team.none,
+            };
+
+            PlayerDatas.Add(player, data);
+            return data;
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -329,105 +311,40 @@ namespace FootBall
         public void OnSceneLoadStart(NetworkRunner runner)
         {
         }
-    }
 
-    /*
-        phases are specific stages of game 
-        manager runs through each game phase in order
-        kind of like game states
-
-        lifecycle of phase:
-        - Phase is started
-        - Phase updates continuosly
-        - phase is ended when its IsCompleted returns true
-
-        phase is considered complete when IsComplete returns true
-            - once complete, manager continues to next phase
-    */
-    public interface IGamePhase
-    {
-        public void OnBegun();
-
-        public void OnUpdate();
-
-        public void OnEnd();
-
-        public bool IsComplete();
-    }
-
-    public class WarmupPhase : IGamePhase
-    {
-        private bool playersReady = false;
-
-        public void OnBegun()
+        private void AssignTeam(PlayerData data)
         {
-            // place all players in spawn positions
+            data.Team = DecideTeam();
 
-            // drop ball in center
-        }
+            // assign spawn point & place player there
+            var viableSpawns = from spawn in SpawnPoints
+                               where spawn._Side == data.Team && spawn._OccupyingPlayer == null
+                               select spawn;
+            var point = viableSpawns.First();
+            point._OccupyingPlayer = data;
+            data.Object.transform.position = point._Transform.position;
+            data.Object.transform.forward = point._Transform.forward;
 
-        public void OnUpdate()
-        {
+            // change color based on team
+            var color = Colors.TeamColors[data.Team];
 
-        }
+            // queue color change - these play around with networked properties so they have to be processed in networkupdate
+            var teamChange = new PendingTeamChange()
+            {
+                _handler = data.Object.GetComponent<PlayerTeamHandler>(),
+                _team = data.Team
+            };
+            teamChangeQueue.Add(teamChange);
 
-        public void OnEnd()
-        {
-
-        }
-
-        public bool IsComplete()
-        {
-            // conditions 
-            // atleast 2 players present 
-            // all players have stood in ready pos for enough time
-            return false;
-        }
-    }
-
-    public class MatchPhase : IGamePhase
-    {
-        public void OnBegun()
-        {
-
-        }
-
-        public void OnUpdate()
-        {
-
-        }
-
-        public void OnEnd()
-        {
-
-        }
-
-        public bool IsComplete()
-        {
-            return false;
-        }
-    }
-
-    public class EndPhase : IGamePhase
-    {
-        public void OnBegun()
-        {
-
-        }
-
-        public void OnUpdate()
-        {
-
-        }
-
-        public void OnEnd()
-        {
-
-        }
-
-        public bool IsComplete()
-        {
-            return false;
+            switch (data.Team)
+            {
+                case Team.blue:
+                    TeamBlueSize++;
+                    break;
+                case Team.red:
+                    TeamRedSize++;
+                    break;
+            }
         }
     }
 }
