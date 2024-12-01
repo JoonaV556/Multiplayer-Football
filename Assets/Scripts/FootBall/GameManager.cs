@@ -40,6 +40,9 @@ namespace FootBall
 
         public SpawnPoint[] SpawnPoints;
 
+        [Tooltip("Delay in seconds before game advances after ball has entered goal.")]
+        public float AfterBallEnterGoalDelay = 1.5f;
+
         private NetworkObject ball;
 
         private int
@@ -100,26 +103,37 @@ namespace FootBall
         private void OnEnable()
         {
             NetworkManager.OnSessionStartedEvent += InitializeMatch;
+            GameEvents.OnBallEnteredGoal += HandleBallEnteredGoal;
         }
 
         private void OnDisable()
         {
             NetworkManager.OnSessionStartedEvent -= InitializeMatch;
+            GameEvents.OnBallEnteredGoal -= HandleBallEnteredGoal;
         }
 
         public override void FixedUpdateNetwork()
         {
             if (!HasStateAuthority) return;
 
-            // process team changes
+            ProcessTeamChanges();
+
+            if (updatePhase) UpdatePhase();
+        }
+
+        private void ProcessTeamChanges()
+        {
             foreach (var change in teamChangeQueue)
             {
                 change._handler.Team = change._team;
                 TypeLogger.TypeLog(this, $"Processed team change for player {change._handler.Object.InputAuthority}. new team: {change._team}", 1);
             }
             teamChangeQueue.Clear();
+        }
 
-            if (updatePhase) UpdatePhase();
+        public NetworkObject GetBall()
+        {
+            return ball;
         }
 
         // updates game phases
@@ -149,7 +163,7 @@ namespace FootBall
 
         private void UpdatePhase(IGamePhase phase)
         {
-            phase.OnUpdate();
+            phase.OnUpdate(Runner.DeltaTime);
         }
 
         private void EndPhase(IGamePhase phase)
@@ -329,6 +343,14 @@ namespace FootBall
 
         public void OnSceneLoadStart(NetworkRunner runner)
         {
+        }
+
+        private void HandleBallEnteredGoal(Team GoalSide)
+        {
+            if (currentPhase != null && HasStateAuthority)
+            {
+                currentPhase.OnBallEnteredGoal(GoalSide);
+            }
         }
 
         private void AssignTeam(PlayerData data)

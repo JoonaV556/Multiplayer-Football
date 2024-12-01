@@ -1,3 +1,6 @@
+using Fusion.Addons.Physics;
+using UnityEngine;
+
 namespace FootBall
 {
 
@@ -12,16 +15,19 @@ namespace FootBall
         - phase is ended when its IsCompleted returns true
 
         phase is considered complete when IsComplete returns true
-            - once complete, manager continues to next phase
+            - once complete, manager runs OnEnd() and continues to next phase
     */
 
     public interface IGamePhase
     {
         public void OnBegun();
 
-        public void OnUpdate();
+        /// <param name="NetworkDeltaTime">time between each update in seconds, determined by fixed network update rate</param>
+        public void OnUpdate(float NetworkDeltaTime);
 
         public void OnEnd();
+
+        public void OnBallEnteredGoal(Team GoalSide);
 
         public bool IsComplete();
     }
@@ -29,6 +35,8 @@ namespace FootBall
     public class WarmupPhase : IGamePhase
     {
         private bool playersReady = false;
+        float afterBallEnterGoalTimer;
+        bool ballTimerRunning = false;
 
         public void OnBegun()
         {
@@ -37,9 +45,21 @@ namespace FootBall
             // drop ball in center
         }
 
-        public void OnUpdate()
+        public void OnUpdate(float NetworkDeltaTime)
         {
+            if (ballTimerRunning)
+            {
+                afterBallEnterGoalTimer += NetworkDeltaTime;
+            }
 
+            var shouldResetBall = ballTimerRunning
+            && afterBallEnterGoalTimer >= GameManager.Instance.AfterBallEnterGoalDelay;
+
+            if (shouldResetBall)
+            {
+                ballTimerRunning = false;
+                ResetBall();
+            }
         }
 
         public void OnEnd()
@@ -54,6 +74,27 @@ namespace FootBall
             // all players have stood in ready pos for enough time
             return false;
         }
+
+        public void OnBallEnteredGoal(Team GoalSide)
+        {
+            afterBallEnterGoalTimer = 0f;
+            ballTimerRunning = true;
+            TypeLogger.TypeLog(this, "ball entered goal during warmup", 1);
+        }
+
+        private void ResetBall()
+        {
+            var ball = GameManager.Instance.GetBall();
+            var ballRigid = ball.GetComponent<Rigidbody>();
+            var ballNetworkRigid = ball.GetComponent<NetworkRigidbody3D>();
+
+            // stop movement
+            ballRigid.linearVelocity = Vector3.zero;
+            ballRigid.angularVelocity = Vector3.zero;
+            // place in spawn pos
+            ballNetworkRigid.Teleport(GameManager.Instance.BallSpawnPosition);
+            TypeLogger.TypeLog(this, "Respawned ball", 1);
+        }
     }
 
     public class MatchPhase : IGamePhase
@@ -63,7 +104,7 @@ namespace FootBall
 
         }
 
-        public void OnUpdate()
+        public void OnUpdate(float NetworkDeltaTime)
         {
 
         }
@@ -76,6 +117,10 @@ namespace FootBall
         public bool IsComplete()
         {
             return false;
+        }
+
+        public void OnBallEnteredGoal(Team GoalSide)
+        {
         }
     }
 
@@ -86,7 +131,7 @@ namespace FootBall
 
         }
 
-        public void OnUpdate()
+        public void OnUpdate(float NetworkDeltaTime)
         {
 
         }
@@ -99,6 +144,10 @@ namespace FootBall
         public bool IsComplete()
         {
             return false;
+        }
+
+        public void OnBallEnteredGoal(Team GoalSide)
+        {
         }
     }
 
