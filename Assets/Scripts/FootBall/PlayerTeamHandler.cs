@@ -17,29 +17,11 @@ namespace FootBall
 
         public Team localTeam = Team.none;
 
-        private ChangeDetector _changeDetector;
-
-        public override void Spawned()
-        {
-            _changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
-        }
-
         public override void FixedUpdateNetwork()
         {
             if (localTeam != Team)
             {
                 UpdateTeam(Team);
-            }
-
-            if (_changeDetector == null) return;
-            foreach (var change in _changeDetector.DetectChanges(this))
-            {
-                switch (change)
-                {
-                    case nameof(Team):
-                        TypeLogger.TypeLog(this, "Detected team change w changedetector", 1);
-                        break;
-                }
             }
         }
 
