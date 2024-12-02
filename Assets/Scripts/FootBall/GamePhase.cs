@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Linq;
 using Fusion;
 using Fusion.Addons.Physics;
-using Mono.Cecil.Cil;
 using UnityEngine;
 
 namespace FootBall
@@ -37,31 +37,74 @@ namespace FootBall
 
     public class WarmupPhase : IGamePhase
     {
-        private bool playersReady = false;
-        float afterBallEnterGoalTimer;
-        bool ballTimerRunning = false;
+        private float afterBallEnterGoalTimer;
+
+        private bool ballTimerRunning = false;
+
         private NetworkRunner _runner;
 
-        private List<KeyValuePair<PlayerRef, NetworkObject>> readyHandlers;
+        private List<KeyValuePair<PlayerRef, NetworkObject>> readyHandlers; // ready handlers track and update ready state for each player
+
+        private NetworkObject readyHandlerPrefab;
 
         public void OnBegun(NetworkRunner runner)
         {
             _runner = runner;
-
-            // get all players
+            readyHandlerPrefab = GameManager.Instance.ReadyHandlerPrefab;
 
             // spawn ready handlers for each player
-
-            // GameManager.Instance.Runner.Spawn();
+            readyHandlers = new();
+            foreach (var player in runner.ActivePlayers)
+            {
+                readyHandlers.Add(
+                    new KeyValuePair<PlayerRef, NetworkObject>(
+                        player,
+                        runner.Spawn(readyHandlerPrefab, Vector3.zero, Quaternion.identity, player)
+                    )
+                );
+            }
         }
 
         public void OnUpdate(float NetworkDeltaTime)
         {
             UpdateBall(NetworkDeltaTime);
 
-            // spawn ready handlers for newly joining players
+            if (readyHandlers != null)
+                UpkeepReadyHandlers();
+        }
 
+        private void UpkeepReadyHandlers()
+        {
+            if (_runner == null) return;
+
+            // spawn ready handlers for newly joining players
+            foreach (var player in _runner.ActivePlayers)
+            {
+                if (!readyHandlers.Any(handler => handler.Key.Equals(player)))
+                {
+                    var handler = new KeyValuePair<PlayerRef, NetworkObject>(
+                        player,
+                        _runner.Spawn(readyHandlerPrefab, Vector3.zero, Quaternion.identity, player)
+                    );
+                    readyHandlers.Add(handler);
+                }
+            }
             // remove ready handlers for leaving players
+            var toRemove = new List<KeyValuePair<PlayerRef, NetworkObject>>();
+            foreach (var handler in readyHandlers)
+            {
+                if (!_runner.IsPlayerValid(handler.Key))
+                {
+                    toRemove.Add(handler);
+                }
+            }
+            if (toRemove.Any())
+            {
+                foreach (var handler in toRemove)
+                {
+                    readyHandlers.Remove(handler);
+                }
+            }
         }
 
         private void UpdateBall(float NetworkDeltaTime)
@@ -83,7 +126,12 @@ namespace FootBall
 
         public void OnEnd()
         {
-
+            // despawn leftover handlers
+            foreach (var handler in readyHandlers)
+            {
+                _runner.Despawn(handler.Value);
+            }
+            readyHandlers.Clear();
         }
 
         public bool IsComplete()

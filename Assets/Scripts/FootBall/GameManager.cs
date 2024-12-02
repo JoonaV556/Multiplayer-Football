@@ -159,17 +159,20 @@ namespace FootBall
 
         private void BeginPhase(IGamePhase phase)
         {
+            if (!HasStateAuthority) return;
             currentPhase = phase;
-            currentPhase.OnBegun();
+            currentPhase.OnBegun(Runner);
         }
 
         private void UpdatePhase(IGamePhase phase)
         {
+            if (!HasStateAuthority) return;
             phase.OnUpdate(Runner.DeltaTime);
         }
 
         private void EndPhase(IGamePhase phase)
         {
+            if (!HasStateAuthority) return;
             phase.OnEnd();
             // todo - switch to next phase
         }

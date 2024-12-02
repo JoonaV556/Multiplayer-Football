@@ -21,7 +21,10 @@ public class ReadyHandler : NetworkBehaviour
     public override void Spawned()
     {
         if (HasInputAuthority)
+        {
             OnLocalReadyHandlerSpawned?.Invoke();
+            OnLocalReadyStateChanged?.Invoke(Ready);
+        }
     }
 
     public override void FixedUpdateNetwork()
