@@ -34,6 +34,8 @@ namespace FootBall
 
         public NetworkObject PlayerPrefab;
 
+        public NetworkObject ReadyHandlerPrefab;
+
         public NetworkObject BallPrefab;
 
         public Vector3 BallSpawnPosition = Vector3.zero;

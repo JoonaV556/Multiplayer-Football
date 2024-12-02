@@ -3304,6 +3304,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 3894992498498455800, guid: d2c8a4b365f6f4845b0f8c180df0b545, type: 3}
+  ReadyHandlerPrefab: {fileID: 6081062027967851627, guid: a240a2355d773394c8c2067d87d64574, type: 3}
   BallPrefab: {fileID: 2001114452217172772, guid: 4fc499c0e8ce915409dd2b7d55f7eef5, type: 3}
   BallSpawnPosition: {x: 0, y: 1, z: 0}
   SpawnPoints:

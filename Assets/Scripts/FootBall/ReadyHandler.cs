@@ -11,10 +11,18 @@ public class ReadyHandler : NetworkBehaviour
     /// Fired when local player ready state changes. bool for new state
     /// </summary>
     public static event Action<bool> OnLocalReadyStateChanged;
+    public static event Action OnLocalReadyHandlerSpawned;
+    public static event Action OnLocalReadyHandlerDespawned;
 
     [Networked]
     public bool Ready { get; set; } = false;
     private bool localReady = false;
+
+    public override void Spawned()
+    {
+        if (HasInputAuthority)
+            OnLocalReadyHandlerSpawned?.Invoke();
+    }
 
     public override void FixedUpdateNetwork()
     {
@@ -39,5 +47,11 @@ public class ReadyHandler : NetworkBehaviour
             localReady = Ready;
             OnLocalReadyStateChanged?.Invoke(localReady);
         }
+    }
+
+    public override void Despawned(NetworkRunner runner, bool hasState)
+    {
+        if (HasInputAuthority)
+            OnLocalReadyHandlerDespawned?.Invoke();
     }
 }

@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using Fusion;
 using Fusion.Addons.Physics;
+using Mono.Cecil.Cil;
 using UnityEngine;
 
 namespace FootBall
@@ -20,7 +23,7 @@ namespace FootBall
 
     public interface IGamePhase
     {
-        public void OnBegun();
+        public void OnBegun(NetworkRunner runner);
 
         /// <param name="NetworkDeltaTime">time between each update in seconds, determined by fixed network update rate</param>
         public void OnUpdate(float NetworkDeltaTime);
@@ -37,15 +40,31 @@ namespace FootBall
         private bool playersReady = false;
         float afterBallEnterGoalTimer;
         bool ballTimerRunning = false;
+        private NetworkRunner _runner;
 
-        public void OnBegun()
+        private List<KeyValuePair<PlayerRef, NetworkObject>> readyHandlers;
+
+        public void OnBegun(NetworkRunner runner)
         {
-            // place all players in spawn positions
+            _runner = runner;
 
-            // drop ball in center
+            // get all players
+
+            // spawn ready handlers for each player
+
+            // GameManager.Instance.Runner.Spawn();
         }
 
         public void OnUpdate(float NetworkDeltaTime)
+        {
+            UpdateBall(NetworkDeltaTime);
+
+            // spawn ready handlers for newly joining players
+
+            // remove ready handlers for leaving players
+        }
+
+        private void UpdateBall(float NetworkDeltaTime)
         {
             if (ballTimerRunning)
             {
@@ -99,7 +118,7 @@ namespace FootBall
 
     public class MatchPhase : IGamePhase
     {
-        public void OnBegun()
+        public void OnBegun(NetworkRunner runner)
         {
             TypeLogger.TypeLog(this, "begun match phase", 1);
         }
@@ -126,7 +145,7 @@ namespace FootBall
 
     public class EndPhase : IGamePhase
     {
-        public void OnBegun()
+        public void OnBegun(NetworkRunner runner)
         {
 
         }
