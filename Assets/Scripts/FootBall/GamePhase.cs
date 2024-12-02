@@ -101,7 +101,7 @@ namespace FootBall
     {
         public void OnBegun()
         {
-
+            TypeLogger.TypeLog(this, "begun match phase", 1);
         }
 
         public void OnUpdate(float NetworkDeltaTime)

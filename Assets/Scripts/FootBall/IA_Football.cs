@@ -80,6 +80,15 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleReady"",
+                    ""type"": ""Button"",
+                    ""id"": ""3f226c61-6038-4321-b4dd-dc3917bd7297"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -192,6 +201,17 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
                     ""action"": ""DirectionalJump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8a8e15c0-f10a-40c8-a94d-57951bf63bc1"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleReady"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -206,6 +226,7 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
         m_PlayerControls_ToggleCursorLock = m_PlayerControls.FindAction("ToggleCursorLock", throwIfNotFound: true);
         m_PlayerControls_Jump = m_PlayerControls.FindAction("Jump", throwIfNotFound: true);
         m_PlayerControls_DirectionalJump = m_PlayerControls.FindAction("DirectionalJump", throwIfNotFound: true);
+        m_PlayerControls_ToggleReady = m_PlayerControls.FindAction("ToggleReady", throwIfNotFound: true);
     }
 
     ~@IA_Football()
@@ -278,6 +299,7 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerControls_ToggleCursorLock;
     private readonly InputAction m_PlayerControls_Jump;
     private readonly InputAction m_PlayerControls_DirectionalJump;
+    private readonly InputAction m_PlayerControls_ToggleReady;
     public struct PlayerControlsActions
     {
         private @IA_Football m_Wrapper;
@@ -288,6 +310,7 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
         public InputAction @ToggleCursorLock => m_Wrapper.m_PlayerControls_ToggleCursorLock;
         public InputAction @Jump => m_Wrapper.m_PlayerControls_Jump;
         public InputAction @DirectionalJump => m_Wrapper.m_PlayerControls_DirectionalJump;
+        public InputAction @ToggleReady => m_Wrapper.m_PlayerControls_ToggleReady;
         public InputActionMap Get() { return m_Wrapper.m_PlayerControls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -315,6 +338,9 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
             @DirectionalJump.started += instance.OnDirectionalJump;
             @DirectionalJump.performed += instance.OnDirectionalJump;
             @DirectionalJump.canceled += instance.OnDirectionalJump;
+            @ToggleReady.started += instance.OnToggleReady;
+            @ToggleReady.performed += instance.OnToggleReady;
+            @ToggleReady.canceled += instance.OnToggleReady;
         }
 
         private void UnregisterCallbacks(IPlayerControlsActions instance)
@@ -337,6 +363,9 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
             @DirectionalJump.started -= instance.OnDirectionalJump;
             @DirectionalJump.performed -= instance.OnDirectionalJump;
             @DirectionalJump.canceled -= instance.OnDirectionalJump;
+            @ToggleReady.started -= instance.OnToggleReady;
+            @ToggleReady.performed -= instance.OnToggleReady;
+            @ToggleReady.canceled -= instance.OnToggleReady;
         }
 
         public void RemoveCallbacks(IPlayerControlsActions instance)
@@ -362,5 +391,6 @@ public partial class @IA_Football: IInputActionCollection2, IDisposable
         void OnToggleCursorLock(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnDirectionalJump(InputAction.CallbackContext context);
+        void OnToggleReady(InputAction.CallbackContext context);
     }
 }

@@ -9,6 +9,11 @@ namespace FootBall
 {
     public class InputManager : MonoBehaviour, INetworkRunnerCallbacks
     {
+        /* 
+        TODO:
+        button handling needs some refactoring to reduce stupid code
+        */
+
         public InputActionAsset inputActions;
 
         public static InputData Data = new InputData(); // input data struct which is updated continuously, other systems can read input from here
@@ -27,9 +32,11 @@ namespace FootBall
         lookAction,
         toggleMenuAction,
         jumpAction,
+        readyAction,
         directionalJumpAction;
 
         private bool jumpPending = false;
+        private bool readyPending = false;
 
         public void SetHorizontalLookSensitivityMultiplier(float alpha)
         {
@@ -53,6 +60,7 @@ namespace FootBall
             toggleCursorAction = inputActions.FindAction("ToggleCursorLock", true);
             jumpAction = inputActions.FindAction("Jump", true);
             directionalJumpAction = inputActions.FindAction("DirectionalJump", true);
+            readyAction = inputActions.FindAction("ToggleReady", true);
 
             Cursor.lockState = CursorLockMode.Locked;
         }
@@ -66,6 +74,7 @@ namespace FootBall
         {
             // reset before each loop
             Data.JumpTriggered = false;
+            Data.ReadyTriggered = false;
 
             // send input over to server
             Data.MoveInput = moveAction.ReadValue<Vector2>();
@@ -81,6 +90,11 @@ namespace FootBall
                 Data.JumpTriggered = true;
                 jumpPending = false;
             }
+            if (readyPending)
+            {
+                Data.ReadyTriggered = true;
+                readyPending = false;
+            }
 
             Data.DirectionalJumpActive = Input.GetKey(KeyCode.LeftShift); // TODO new input system
 
@@ -93,6 +107,10 @@ namespace FootBall
             if (jumpAction.WasPressedThisFrame())
             {
                 jumpPending = true;
+            }
+            if (readyAction.WasPressedThisFrame())
+            {
+                readyPending = true;
             }
 
             Data.ToggleMenuTriggered = false;

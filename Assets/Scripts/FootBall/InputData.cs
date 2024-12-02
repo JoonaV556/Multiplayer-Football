@@ -11,6 +11,7 @@ namespace FootBall
         public bool ToggleMenuTriggered;
         public bool JumpTriggered;
         public bool DirectionalJumpActive;
+        public bool ReadyTriggered;
     }
 
 }
